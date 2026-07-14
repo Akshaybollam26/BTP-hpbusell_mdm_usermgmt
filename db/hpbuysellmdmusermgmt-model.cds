@@ -1,4 +1,4 @@
-namespace hpbuysell.mdm.UserMgmt;
+namespace hpbuysell.mdm.usermgmt;
 
 using {cuid} from '@sap/cds/common';
 

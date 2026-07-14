@@ -59,22 +59,14 @@ module.exports = (srv) => {
             return req.reject(404, `User ${email} not found`);
         }
 
-        /*
-         * According to TDS, only firstName and lastName can be changed.
-         * Audit fields must not be manually updated by API/UI.
-         */
+        // created fields must never be changed
         const nonEditableFields = [
             'createdBy',
-            'createdOn',
-            'changedBy',
-            'changedOn'
+            'createdOn'
         ];
 
         for (const field of nonEditableFields) {
-            if (
-                field in req.data &&
-                req.data[field] !== existing[field]
-            ) {
+            if (field in req.data) {
                 return req.reject(
                     400,
                     `Field '${field}' cannot be modified`

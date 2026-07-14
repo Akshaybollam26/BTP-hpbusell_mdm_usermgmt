@@ -1,4 +1,4 @@
-using {hpbuysell.mdm.UserMgmt as db} from '../db/hpbuysellmdmUserMgmt-model';
+using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
 
 
 service UserManagementService @(path: '/user-management') {

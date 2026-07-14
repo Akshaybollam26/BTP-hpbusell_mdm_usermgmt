@@ -2,6 +2,7 @@ node_modules/
 target/
 _out/
 gen/
+test/
 
 .cdsrc-private.json
 default-*.json
@@ -17,3 +18,4 @@ mta_archives/
 
 # @cap-js/cds-typer
 @cds-models
+
