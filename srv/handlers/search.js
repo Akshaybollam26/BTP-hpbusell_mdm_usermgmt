@@ -14,7 +14,55 @@ module.exports = (srv) => {
      * - partnerId
      * - projectId
      */
+    srv.on('getUnassignedCustomers', async (req) => {
+        const userEmail = req.data?.userEmail || req.params?.[0]?.userEmail || '';
+        if (!userEmail) {
+            return [];
+        }
+        const assignedCustomers = await SELECT
+            .from(PartnerAssignments)
+            .columns('partnerId')
+            .where({
+                user_email: userEmail
+            });
+        const assignedCustomerIDs = assignedCustomers.map(c => c.partnerId);
+        if(!assignedCustomerIDs.length) {
+            return SELECT.from('CustomerMaster')
+            .where({status: 'A'});
+        }
+        const unassignedCustomers = await SELECT
+            .from('CustomerMaster')
+            .where({
+                customerId: { not: { in: assignedCustomerIDs } },
+                status: 'A'
+            });
 
+        return unassignedCustomers;
+    });
+    srv.on('getUnassignedSuppliers', async (req) => {
+        const userEmail = req.data?.userEmail || req.params?.[0]?.userEmail || '';
+        if (!userEmail) {
+            return [];
+        }
+        const assignedSuppliers = await SELECT
+            .from(PartnerAssignments)
+            .columns('partnerId')
+            .where({
+                user_email: userEmail
+            });
+        const assignedSupplierIDs = assignedSuppliers.map(s => s.partnerId);
+        if(!assignedSupplierIDs.length) {
+            return SELECT.from('SupplierMaster').where({status: 'A'});
+        }
+        const unassignedSuppliers = await SELECT
+            .from('SupplierMaster')
+            .where({
+                supplierId: { not: { in: assignedSupplierIDs } },
+                status: 'A'
+            });
+
+        return unassignedSuppliers;
+    });
     srv.on('searchUsers', async (req) => {
         const searchTerm =
             req.data?.searchTerm ||

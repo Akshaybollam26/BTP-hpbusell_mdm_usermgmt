@@ -24,4 +24,6 @@ service UserManagementService @(path: '/user-management') {
     entity ProjectMaster      as projection on db.ProjectMaster where status = 'A';
 
     function searchUsers(searchTerm: String) returns array of Users;
+    function getUnassignedCustomers(userEmail : String) returns array of CustomerMaster;
+    function getUnassignedSuppliers(userEmail : String) returns array of SupplierMaster;
 }
