@@ -1,4 +1,5 @@
 using UserManagementService as service from '../../srv/hpbuysellmdmusermgmt-service';
+
 annotate service.Users with @(
     UI.HeaderInfo : {
         TypeName : 'User',
@@ -32,18 +33,18 @@ annotate service.Users with @(
             },
             {
                 $Type : 'UI.DataField',
-                Value : createdOn,
-                Label : 'Created On',
+                Value : createdAt,
+                Label : 'Created At',
             },
             {
                 $Type : 'UI.DataField',
-                Value : changedBy,
-                Label : 'Changed By',
+                Value : modifiedBy,
+                Label : 'Modified By',
             },
             {
                 $Type : 'UI.DataField',
-                Value : changedOn,
-                Label : 'Changed On',
+                Value : modifiedAt,
+                Label : 'Modified At',
             },
         ],
     },
@@ -96,8 +97,8 @@ annotate service.Users with @(
         },
         {
             $Type : 'UI.DataField',
-            Value : createdOn,
-            Label : 'Created On',
+            Value : createdAt,
+            Label : 'Created At',
         },
     ],
     UI.SelectionFields : [
@@ -107,7 +108,12 @@ annotate service.Users with @(
     ]
 );
 
+
 annotate service.PartnerAssignments with @(
+    Capabilities: {
+        InsertRestrictions: {Insertable: true},
+        DeleteRestrictions: {Deletable: true}
+    },
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
@@ -126,7 +132,7 @@ annotate service.ChangeLogs with @(
     UI.LineItem : [
         {
             $Type : 'UI.DataField',
-            Value : user_email,
+            Value : changedBy,
             Label : 'User',
         },
         {

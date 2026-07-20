@@ -146,10 +146,10 @@
                   "actions": {
                     "custAsstAction": {
                       "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddCustButton",
-                      "visible": true,
                       "enabled": true,
                       "requiresSelection": false,
-                      "text": "+ Add"
+                      "text": "+ Add",
+                      "visible": "{= ${ui>/editMode} === 'Editable' }"
                     }
                   },
                   "columns": {
@@ -175,7 +175,7 @@
                   "actions": {
                     "supplierAsstAction": {
                       "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddSuppButton",
-                      "visible": true,
+                      "visible": "{= ${ui>/editMode} === 'Editable'}",
                       "enabled": true,
                       "requiresSelection": false,
                       "text": "+ Add"

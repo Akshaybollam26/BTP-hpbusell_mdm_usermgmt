@@ -1,6 +1,7 @@
 sap.ui.define([
-    "sap/m/MessageToast"
-], function(MessageToast) {
+    "sap/m/MessageToast",
+    "sap/ui/model/json/JSONModel"
+], function(MessageToast, JSONModel) {
     'use strict';
 
     return {
@@ -10,6 +11,21 @@ sap.ui.define([
          * @param oEvent the event object provided by the event provider.
          */
         onPress: async function(oEvent) {
+            var oController = this._controller;
+            var oModel = oController.getView().getModel();
+            var oUser = oEvent.getSource().getBindingContext().getObject();
+            var sPartnerId = oUser.partnerId;
+            try {
+                const oOperation = oModel.bindContext(`/findSelectedProjects(...)` );
+                oOperation.setParameter("partnerId", sPartnerId);
+                await oOperation.execute();
+                const aProjects = oOperation.getBoundContext().getObject().value;
+                oController.getView().setModel(new JSONModel(aProjects), "projects");
+            } catch (oError) {
+                MessageToast.show("Unable to load projects");
+                console.error(oError);
+                return;
+            }
             debugger;
             if (!this._oManageProjectsDialog) {
                 this._oManageProjectsDialog = await this.loadFragment({
@@ -17,16 +33,6 @@ sap.ui.define([
                 });
             }
             this._oManageProjectsDialog.open();
-        },
-        onOkProjects: function(oEvent) {
-            this._oManageProjectsDialog.close();
-            this._oManageProjectsDialog.destroy();
-            this._oManageProjectsDialog = null;
-        },
-        onCancelDialog: function(oEvent) {
-            this._oManageProjectsDialog.close();
-            this._oManageProjectsDialog.destroy();
-            this._oManageProjectsDialog = null;
         }
     };
 });

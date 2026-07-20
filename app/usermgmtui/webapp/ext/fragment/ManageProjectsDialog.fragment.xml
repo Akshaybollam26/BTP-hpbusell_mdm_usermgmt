@@ -3,17 +3,36 @@
     xmlns:core="sap.ui.core">
     <Dialog
         id="manageProjectsDialog"
+        title="Manage Projects"
         contentWidth="55%" contentHeight="60%">
         <content>
-            <Text text="Manage Projects" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd"/>
+            <!-- <Text text="Manage Projects" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
+            <Table items="{projects>/}" mode="MultiSelect" width="100%">
+                <columns>
+                    <Column>
+                        <Text text="Project ID"/>
+                    </Column>
+                    <Column>
+                        <Text text="Project Name"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem type="Active" selected="{projects>selected}">
+                        <cells>
+                            <Text text="{projects>projectId}"/>
+                            <Text text="{projects>projectName}"/>
+                        </cells>
+                    </ColumnListItem>
+                </items>
+            </Table>
         </content>
         <beginButton>
             <!-- <Button text="Add 2" press=".onAddCustomer"/> -->
-            <Button text="OK" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustMngProjColumn'}" press="handler.onOkProjects" />
+            <Button text="OK" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}" press="handler.onOkProjects" />
         </beginButton>
         <endButton>
             <!-- <Button text="Cancel" press=".onCloseDialog"/> -->
-            <Button text="Cancel" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustMngProjColumn'}" press="handler.onCancelDialog" />
+            <Button text="Cancel" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}" press="handler.onCancelDialog" />
         </endButton>
     </Dialog>
 </core:FragmentDefinition>

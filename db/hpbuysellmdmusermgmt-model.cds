@@ -1,13 +1,12 @@
 namespace hpbuysell.mdm.usermgmt;
 
-using {cuid} from '@sap/cds/common';
-
+using {cuid, managed} from '@sap/cds/common';
 /**
  * Primary entity: application Users
  * Email is the business key. Only firstName/lastName may
  * be changed once a record has been created.
  */
-entity Users {
+entity Users : managed{
 
     key email      : String(241)
         @title: '{i18n>Email}';
@@ -19,18 +18,6 @@ entity Users {
         lastName   : String(100)
         @title: '{i18n>LastName}'
         @mandatory;
-
-        createdBy  : String(255)
-        @title: '{i18n>CreatedBy}';
-
-        createdOn  : Timestamp
-        @title: '{i18n>CreatedOn}';
-
-        changedBy  : String(255)
-        @title: '{i18n>ChangedBy}';
-
-        changedOn  : Timestamp
-        @title: '{i18n>ChangedOn}';
 
         customers  : Composition of many PartnerAssignments
                          on  customers.user        = $self

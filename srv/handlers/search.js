@@ -63,6 +63,46 @@ module.exports = (srv) => {
 
         return unassignedSuppliers;
     });
+    srv.on('findSelectedProjects', async (req) => {
+        const partnerId = req.data?.partnerId || req.params?.[0]?.partnerId || '';
+        if (!partnerId) {
+            return [];
+        }
+        const cuidForPartner = await SELECT
+            .from(PartnerAssignments)
+            .columns('ID')
+            .where({
+                partnerId: partnerId
+            });
+        const cuidForPartnerValue = cuidForPartner[0]?.ID;
+        const assignedProjects = await SELECT
+            .from(ProjectAssignments)
+            .columns('projectId')
+            .where({
+                partner_ID: cuidForPartnerValue
+            });
+        console.log('assignedProjects:', assignedProjects);
+        const assignedProjectIDs = assignedProjects.map(p => p.projectId);
+        // if(!assignedProjectIDs.length) {
+        //     return SELECT.from('ProjectMaster').where({status: 'A'});
+        // }
+        // const unassignedProjects = await SELECT
+        //     .from('ProjectMaster')
+        //     .where({
+        //         projectId: { not: { in: assignedProjectIDs } },
+        //         status: 'A'
+        //     });
+        // console.log('unassignedProjects:', unassignedProjects);
+        const allProjects = await SELECT
+            .from('ProjectMaster')
+            .where({ status: 'A' });
+
+        const result = allProjects.map(project => ({
+            ...project,
+            selected: assignedProjectIDs.includes(project.projectId)
+        }));
+        return result;
+    });
     srv.on('searchUsers', async (req) => {
         const searchTerm =
             req.data?.searchTerm ||

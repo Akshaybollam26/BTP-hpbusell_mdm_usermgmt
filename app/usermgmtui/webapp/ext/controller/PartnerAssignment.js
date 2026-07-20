@@ -14,7 +14,6 @@ sap.ui.define([
          * @param aSelectedContexts the selected contexts of the table rows.
          */
         onPressAddCustButton: async function(oContext, aSelectedContexts) {
-            MessageToast.show("Custom handler invoked.");
             //read customer master here and set the model
             // this._helperFunction("/CustomerMaster");
             var oController = this._controller;
@@ -161,17 +160,20 @@ sap.ui.define([
                 partnerId: this._custAsstFlag ? selectedPartner.customerId : selectedPartner.supplierId,
                 partnerName: this._custAsstFlag ? selectedPartner.customerName : selectedPartner.supplierName
             };
-            const oListBinding = oModel.bindList("/PartnerAssignments");
+            const bindToEntity = this._custAsstFlag ? "customers" : "suppliers";
+            // const oListBinding = oModel.bindList("/PartnerAssignments");
+            const oListBinding = oModel.bindList(bindToEntity, oContext);
             try {
-                await oListBinding.create(oPayload);
-                MessageToast.show("Partner assignment created successfully.");
+                const oNewContext = oListBinding.create(oPayload);
+                await oNewContext.created(); //patch to draft state
+                MessageToast.show("Partner assigned successfully.");
                 await oContext.requestSideEffects([
                     {
                         $NavigationPropertyPath: this._custAsstFlag ? "customers" : "suppliers",
                     }
                 ]);
             } catch (oError) {
-                MessageToast.show("Failed to create partner assignment.");
+                MessageToast.show("Failed to assign partner.");
                 console.error(oError);
             }
             this._custAsstFlag = false;
