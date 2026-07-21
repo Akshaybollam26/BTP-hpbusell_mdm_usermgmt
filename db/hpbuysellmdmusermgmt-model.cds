@@ -47,6 +47,7 @@ entity PartnerAssignments : cuid {
     @title: '{i18n>PartnerId}'
     @mandatory;
 
+    @readonly
     partnerName : String(100)
     @title: '{i18n>PartnerName}';
 

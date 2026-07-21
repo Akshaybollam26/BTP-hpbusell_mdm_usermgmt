@@ -17,6 +17,7 @@ sap.ui.define([
             var oUser = oEvent.getSource().getBindingContext().getObject();
             var sPartnerId = oUser.partnerId;
             this._sPartnerUuid = oUser.ID;
+            this._oPartnerAssignmentContext = oEvent.getSource().getBindingContext();
             try {
                 const oOperation = oModel.bindContext(`/findSelectedProjects(...)` );
                 oOperation.setParameter("partnerId", sPartnerId);
@@ -42,7 +43,7 @@ sap.ui.define([
             debugger;
             var oController = this._controller;
             var oModel = oController.getView().getModel();
-
+            var oContext = oController.getView().getBindingContext();
             const aChangedProjectList = oController.getView().getModel("projects").oData;
             const aSelectedProjectsIds = aChangedProjectList.filter(project => project.selected === true).map(project => project.projectId);
             const aUnselectedProjectsIds = aChangedProjectList.filter(project => project.selected === false).map(project => project.projectId);
@@ -52,15 +53,27 @@ sap.ui.define([
             const aProjectsToAdd = aSelectedProjectsIds.filter(projectId => !aInitialSelectedProjectIds.includes(projectId));
             // Projects newly unselected (to DELETE)
             const aProjectsToRemove = aUnselectedProjectsIds.filter(projectId => aInitialSelectedProjectIds.includes(projectId));
+            const sContextPath = this._oPartnerAssignmentContext.getPath();
             try{
                 if(aProjectsToAdd.length) {
-                    await oModel.bindContext(`/PartnerAssignments(${this._sPartnerUuid}, IsActiveEntity=true)/UserManagementService.addProjects(...)`).setParameter("projectIds", aProjectsToAdd).execute();
+                    await oModel.bindContext(`/PartnerAssignments(ID=${this._sPartnerUuid},IsActiveEntity=true)/UserManagementService.addProjects(...)`).setParameter("projectIds", aProjectsToAdd).execute();
+                    // await oModel.bindContext(`${sContextPath}/UserManagementService.addProjects(...)`).setParameter("projectIds", aProjectsToAdd).execute();
+                    await this._oPartnerAssignmentContext.requestSideEffects([
+                    {
+                        $NavigationPropertyPath: "projects",
+                    }
+                ]);
                 }
                 if(aProjectsToRemove.length) {
-                    await oModel.bindContext(`/PartnerAssignments(${this._sPartnerUuid}, IsActiveEntity=true)/UserManagementService.removeProjects(...)`).setParameter("projectIds", aProjectsToRemove).execute();
+                    await oModel.bindContext(`/PartnerAssignments(ID=${this._sPartnerUuid},IsActiveEntity=true)/UserManagementService.removeProjects(...)`).setParameter("projectIds", aProjectsToRemove).execute();
+                    // await oModel.bindContext(`${sContextPath}/UserManagementService.removeProjects(...)`).setParameter("projectIds", aProjectsToRemove).execute();
+                    await this._oPartnerAssignmentContext.requestSideEffects([
+                    {
+                        $NavigationPropertyPath: "projects",
+                    }
+                ]);
                 }
                 new MessageToast.show("Projects updated successfully");
-                oModel.refresh();
             }catch(oError){
                 MessageToast.show("Unable to update projects");
                 console.error(oError);
