@@ -6,4 +6,6 @@ module.exports = cds.service.impl(async function () {
     require('./handlers/changelog')(this);
     require('./handlers/projectActions')(this);
     require('./handlers/search')(this);
+    require('./handlers/auth')(this);
+    
 });

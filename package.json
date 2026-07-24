@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "dependencies": {
     "@sap/cds": "^9",
-    "better-sqlite3": "^13.0.1"
+    "better-sqlite3": "^13.0.1",
+    "@sap/xssec": "^4"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4",
@@ -25,5 +26,12 @@
   ],
   "sapux": [
     "app/usermgmtui"
-  ]
+  ],
+  "cds": {
+    "requires": {
+      "[production]": {
+        "auth": "xsuaa"
+      }
+    }
+  }
 }

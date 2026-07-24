@@ -1,20 +1,31 @@
 {
-  "xsappname": "btp-hpbuysell_mdm_usermgmt",
-  "tenant-mode": "dedicated",
-  "description": "Security profile of called application",
   "scopes": [
     {
-      "name": "uaa.user",
-      "description": "UAA"
+      "name": "$XSAPPNAME.UsermgmtViewer",
+      "description": "UsermgmtViewer"
+    },
+    {
+      "name": "$XSAPPNAME.UsermgmtManage",
+      "description": "UsermgmtManage"
     }
   ],
+  "attributes": [],
   "role-templates": [
     {
-      "name": "Token_Exchange",
-      "description": "UAA",
+      "name": "UsermgmtViewer",
+      "description": "generated",
       "scope-references": [
-        "uaa.user"
-      ]
+        "$XSAPPNAME.UsermgmtViewer"
+      ],
+      "attribute-references": []
+    },
+    {
+      "name": "UsermgmtManage",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.UsermgmtManage"
+      ],
+      "attribute-references": []
     }
   ]
 }

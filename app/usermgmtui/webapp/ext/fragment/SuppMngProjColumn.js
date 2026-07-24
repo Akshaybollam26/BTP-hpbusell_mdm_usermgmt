@@ -1,9 +1,11 @@
 sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
-], function (MessageToast, JSONModel) {
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator"
+], function (MessageToast, JSONModel, Filter, FilterOperator) {
     'use strict';
- 
+
     return {
         /**
          * Generated event handler.
@@ -50,6 +52,20 @@ sap.ui.define([
                 });
             }
             this._oManageProjectsDialog.open();
+        },
+        onSearchProjects: async function(oEvent){
+            const sValue = oEvent.getParameter("newValue");
+            const oTable = oEvent.getSource().getParent().getContent()[1];  
+            // SearchField is first child, Table is second
+ 
+            const oBinding = oTable.getBinding("items");
+            if (!sValue) {
+                oBinding.filter([]);
+                return;
+            }
+            oBinding.filter([
+                new Filter("projectId", FilterOperator.Contains, sValue)
+            ]);
         },
         onOkProjects: async function (oEvent) {
             var oController = this._controller;

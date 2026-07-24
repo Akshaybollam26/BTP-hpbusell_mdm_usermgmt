@@ -1,7 +1,36 @@
 using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
  
  
-service UserManagementService @(path: '/user-management') {
+service UserManagementService @(path: '/user-management')  @(require: 'authenticated-user') {
+    @odata.singleton  @cds.persistence.skip
+ 
+    entity auth {
+ 
+        key ID                              : String;
+            canCreate                       : Boolean;
+            canUpdate                       : Boolean;
+            canDelete                       : Boolean; 
+    }
+
+    @restrict: [
+        {
+            grant: 'READ',
+            to   : [
+                'UsermgmtViewer',
+                'UsermgmtManage'
+            ]
+        },
+        {
+            grant: [
+                'CREATE',
+                'UPDATE',
+                'DELETE'
+            ],
+            to   : 'UsermgmtManage'
+        }
+ 
+    ]
+    
     @odata.draft.enabled
     @(Capabilities: {
         InsertRestrictions: {Insertable: true},

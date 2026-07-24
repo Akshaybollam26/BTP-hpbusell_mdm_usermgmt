@@ -113,6 +113,22 @@ resources:
       service: xsuaa
       service-name: BTP-hpbuysell_mdm_UserMgmt-xsuaa-service
       service-plan: application
+      config:
+        xsappname: BTP-hpbuysell_mdm_UserMgmt-${org}-${space}
+        tenant-mode: dedicated
+        oauth2-configuration:
+          credential-types:
+            - "binding-secret"
+            - "x509"
+        role-collections:
+          - name: 'UsermgmtViewer (BTP-hpbuysell_mdm_UserMgmt ${org}-${space})'
+            description: 'generated'
+            role-template-references:
+              - '$XSAPPNAME.UsermgmtViewer'
+          - name: 'UsermgmtManage (BTP-hpbuysell_mdm_UserMgmt ${org}-${space})'
+            description: 'generated'
+            role-template-references:
+              - '$XSAPPNAME.UsermgmtManage'
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

@@ -7,6 +7,12 @@
         contentWidth="55%" contentHeight="60%">
         <content>
             <!-- <Text text="Manage Projects" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
+            <SearchField
+                width="95%"
+                class ="sapUiTinyMargin"
+                placeholder="Search Project Id..."
+                liveChange="handler.onSearchProjects"
+                core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}"/>
             <Table items="{projects>/}" mode="MultiSelect" width="100%">
                 <columns>
                     <Column>

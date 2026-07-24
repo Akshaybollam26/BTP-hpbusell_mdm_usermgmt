@@ -1,0 +1,16 @@
+{
+  "requires": {
+    "auth": {
+      "kind": "mocked",
+      "users": {
+        "manage": {
+          "roles": ["UsermgmtManage"]
+        },
+        "viewer": {
+          "roles": ["UsermgmtViewer"]
+        }
+      }
+    }
+  }
+}
+ 

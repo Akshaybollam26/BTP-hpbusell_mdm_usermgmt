@@ -105,7 +105,24 @@ annotate service.Users with @(
         email,
         firstName,
         lastName,
-    ]
+    ],
+    UI.CreateHidden : {
+        $edmJson: {
+            $Not: { $Path: '/auth/canCreate' }
+        }
+    },
+
+    UI.UpdateHidden : {
+        $edmJson: {
+            $Not: { $Path: '/auth/canUpdate' }
+        }
+    },
+ 
+    UI.DeleteHidden : {
+        $edmJson: {
+            $Not: { $Path: '/auth/canDelete' }
+        }
+    }
 );
 
 
