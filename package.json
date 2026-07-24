@@ -2,14 +2,15 @@
   "name": "BTP-hpbuysell_mdm_UserMgmt",
   "version": "1.0.0",
   "dependencies": {
-    "@sap/cds": "^9"
+    "@sap/cds": "^9",
+    "better-sqlite3": "^13.0.1"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4",
     "@sap/cds-dk": "^9",
     "cds-plugin-ui5": "^0.17.0",
-    "rimraf": "^5.0.5",
-    "mbt": "^1.2.49"
+    "mbt": "^1.2.49",
+    "rimraf": "^5.0.5"
   },
   "scripts": {
     "start": "cds-serve",

@@ -59,13 +59,13 @@ annotate service.Users with @(
             $Type : 'UI.ReferenceFacet',
             ID : 'CustomerAsstsFacet',
             Label : 'Customer Assignments',
-            Target : 'customers/@UI.LineItem',
+            Target : 'customers/@UI.LineItem#Customers',
         },
         {
             $Type : 'UI.ReferenceFacet',
             ID : 'SupplierAsstsFacet',
             Label : 'Supplier Assignments',
-            Target : 'suppliers/@UI.LineItem',
+            Target : 'suppliers/@UI.LineItem#Suppliers',
         },
         {
             $Type : 'UI.ReferenceFacet',
@@ -114,7 +114,7 @@ annotate service.PartnerAssignments with @(
         InsertRestrictions: {Insertable: true},
         DeleteRestrictions: {Deletable: true}
     },
-    UI.LineItem: [
+    UI.LineItem #Customers: [
         {
             $Type : 'UI.DataField',
             Value : partnerId,
@@ -126,59 +126,76 @@ annotate service.PartnerAssignments with @(
             Label : 'Customer Name',
         },
     ],
-    // UI.LineItem: [
-    //     {
-    //         $Type : 'UI.DataField',
-    //         Value : partnerId,
-    //         Label : 'Supplier ID',
-    //     },
-    //     {
-    //         $Type : 'UI.DataField',
-    //         Value : partnerName,
-    //         Label : 'Supplier Name',
-    //     },
-    // ]
+    UI.LineItem #Suppliers: [
+        {
+            $Type : 'UI.DataField',
+            Value : partnerId,
+            Label : 'Supplier ID',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : partnerName,
+            Label : 'Supplier Name',
+        },
+    ]
 );
 
-annotate service.Users:firstName with @(
-    Common.Label: 'Customer ID',
-    Common.ValueListWithFixedValues: false,
-    Common.ValueList: {
-        Label: 'Select Customer',
-        CollectionPath: 'CustomerMaster',
-        Parameters: [
-        { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'customerId' },
-        { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'customerName' },
-        ]
-    }
-);
-
+// annotate service.Users:customers with {
+//     partnerId @(
+//         Common.Label: 'Customer ID',
+//         Common.ValueListWithFixedValues: false,
+//         Common.ValueList: {
+//             Label: 'Select Customer',
+//             CollectionPath: 'CustomerMaster',
+//             Parameters: [
+//             { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'customerId' },
+//             { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'customerName' },
+//             ]
+//         }
+//     )
+// };
 annotate service.PartnerAssignments:partnerId with @(
-  Common.Label: 'Customer ID',
-  Common.ValueListWithFixedValues: false,
-  Common.ValueList: {
-    Label: 'Select Customer',
-    CollectionPath: 'CustomerMaster',
-    Parameters: [
-      { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'customerId' },
-      { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'customerName' },
-    ]
-  }
+    Common.ValueList: {
+        CollectionPath: 'BusinessPartnerVH',
+        Parameters: [
+            {
+                $Type : 'Common.ValueListParameterInOut',
+                LocalDataProperty : partnerId,
+                ValueListProperty : 'partnerId',
+            },
+            {
+                $Type : 'Common.ValueListParameterOut',
+                ValueListProperty : 'partnerName',
+                LocalDataProperty : partnerName,
+            },
+            {
+                $Type : 'Common.ValueListParameterIn',
+                ValueListProperty : 'partnerType',
+                LocalDataProperty : partnerType,
+            },
+        ]
+    },
+    Common.ValueListWithFixedValues : false,
 );
-annotate service.Users:suppliers.partnerId with @(
-  Common.Label: 'Supplier ID',
-  Common.ValueList: {
-    Label: 'Select Supplier',
-    CollectionPath: 'SupplierMaster',
-    Parameters: [
-      { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'supplierId' },
-      { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'supplierName' },
-    ]
-  }
-);
+// annotate service.Users:suppliers.partnerId with @(
+//   Common.Label: 'Supplier ID',
+//   Common.ValueList: {
+//     Label: 'Select Supplier',
+//     CollectionPath: 'SupplierMaster',
+//     Parameters: [
+//       { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'supplierId' },
+//       { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'supplierName' },
+//     ]
+//   }
+// );
 
 annotate service.ChangeLogs with @(
     UI.LineItem #ChangeLogs: [
+        {
+            $Type : 'UI.DataField',
+            Value : changedOn,
+            Label : 'Changed On',
+        },
         {
             $Type : 'UI.DataField',
             Value : changedBy,
@@ -203,6 +220,11 @@ annotate service.ChangeLogs with @(
             $Type : 'UI.DataField',
             Value : newValue,
             Label : 'New Value',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : changeType,
+            Label : 'Change Type',
         },
     ]
 );

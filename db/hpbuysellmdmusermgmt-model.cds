@@ -47,9 +47,9 @@ entity PartnerAssignments : cuid {
     @title: '{i18n>PartnerId}'
     @mandatory;
 
-    @readonly
     partnerName : String(100)
     @title: '{i18n>PartnerName}';
+    @Core.Computed
 
     projects    : Composition of many ProjectAssignments
                       on projects.partner = $self;

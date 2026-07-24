@@ -1,4 +1,4 @@
-sap.ui.define(['sap/ui/core/mvc/ControllerExtension'], function (ControllerExtension) {
+sap.ui.define(['sap/ui/core/mvc/ControllerExtension', 'sap/m/MessageToast'], function (ControllerExtension, MessageToast) {
 	'use strict';
 
 	return ControllerExtension.extend('hpbuysell.mdm.usermgmtui.ext.controller.CustomControllerForObjPage', {
@@ -18,8 +18,14 @@ sap.ui.define(['sap/ui/core/mvc/ControllerExtension'], function (ControllerExten
 				var oModel = this.base.getExtensionAPI().getModel();
 			},
 			editFlow: {
-				onBeforeSave: function (oEvent) {
-					new sap.m.MessageToast.show("onBeforeSave called - test");
+				onBeforeSave: async function (oEvent) {
+					// new sap.m.MessageToast.show("onBeforeSave called - test");
+					// const oModel = this.base.getExtensionAPI().getModel();
+					// const oContext = this.base.getView().getBindingContext();
+					// const aProjectsToBeAdded = this.base.getView().getModel("projectsToBeAdded").oData;
+					// const aProjectsToBeRemoved = this.base.getView().getModel("projectsToBeRemoved").oData;
+					// const sPartnerUuid = this.base.getView().getModel("partnerUuid").oData;
+					// debugger;
 				}
 			}
 		}

@@ -142,14 +142,14 @@
               "editableHeaderContent": false,
               "contextPath": "/Users",
               "controlConfiguration": {
-                "customers/@com.sap.vocabularies.UI.v1.LineItem": {
+                "customers/@com.sap.vocabularies.UI.v1.LineItem#Customers": {
                   "actions": {
                     "custAsstAction": {
                       "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddCustButton",
                       "enabled": true,
                       "requiresSelection": false,
                       "text": "+ Add",
-                      "visible": "{= ${ui>/editMode} === 'Editable' }"
+                      "visible": false
                     }
                   },
                   "columns": {
@@ -171,11 +171,11 @@
                     }
                   }
                 },
-                "suppliers/@com.sap.vocabularies.UI.v1.LineItem": {
+                "suppliers/@com.sap.vocabularies.UI.v1.LineItem#Suppliers": {
                   "actions": {
                     "supplierAsstAction": {
                       "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddSuppButton",
-                      "visible": "{= ${ui>/editMode} === 'Editable'}",
+                      "visible": false,
                       "enabled": true,
                       "requiresSelection": false,
                       "text": "+ Add"

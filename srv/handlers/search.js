@@ -2,7 +2,8 @@ module.exports = (srv) => {
     const {
         Users,
         PartnerAssignments,
-        ProjectAssignments
+        ProjectAssignments,
+        ProjectMaster
     } = srv.entities;
 
     /*
@@ -63,45 +64,83 @@ module.exports = (srv) => {
 
         return unassignedSuppliers;
     });
+    //send user email also
     srv.on('findSelectedProjects', async (req) => {
-        const partnerId = req.data?.partnerId || req.params?.[0]?.partnerId || '';
-        if (!partnerId) {
+        // const partnerId = req.data?.partnerId || req.params?.[0]?.partnerId || '';
+        // const userEmail = req.data?.userEmail || req.params?.[0]?.userEmail || '';
+        // if (!partnerId) {
+        //     return [];
+        // }
+        // if(!userEmail) return [];
+
+        // //search for UID based on partner id and user email combo
+        // const partnerRecord = await SELECT
+        //     .from(PartnerAssignments.drafts)
+        //     .columns('ID')
+        //     .where({
+        //         user_email: userEmail,
+        //         partnerId: partnerId,
+        //     });
+        // const cuidForSelectedPartner = partnerRecord[0]?.ID;
+        // const rows = await SELECT.from(PartnerAssignments.drafts);
+        // console.log(rows);
+        // //search based on partner id
+        // const assignedProjects = await SELECT
+        //     .from(ProjectAssignments.drafts)
+        //     .columns('projectId')
+        //     .where({
+        //         partner_ID: cuidForSelectedPartner
+        //     });
+        // console.log('assignedProjects:', assignedProjects);
+        // const assignedProjectIDs = assignedProjects.map(p => p.projectId);
+        // // if(!assignedProjectIDs.length) {
+        // //     return SELECT.from('ProjectMaster').where({status: 'A'});
+        // // }
+        // // const unassignedProjects = await SELECT
+        // //     .from('ProjectMaster')
+        // //     .where({
+        // //         projectId: { not: { in: assignedProjectIDs } },
+        // //         status: 'A'
+        // //     });
+        // // console.log('unassignedProjects:', unassignedProjects);
+        // const allProjects = await SELECT
+        //     .from('ProjectMaster')
+        //     .where({ status: 'A' });
+
+        // const result = allProjects.map(project => ({
+        //     ...project,
+        //     selected: assignedProjectIDs.includes(project.projectId)
+        // }));
+        // return result;
+
+
+
+        const { partnerID, isActiveEntity } = req.data;
+        const isActive = isActiveEntity !== false;
+ 
+        console.log('[DEBUG findSelectedProjects] req.data:', req.data, '| partnerID:', partnerID, '| isActive:', isActive);
+ 
+        if (!partnerID) {
+            console.log('[DEBUG findSelectedProjects] partnerID missing - returning []');
             return [];
         }
-        const cuidForPartner = await SELECT
-            .from(PartnerAssignments)
-            .columns('ID')
-            .where({
-                partnerId: partnerId
-            });
-        const cuidForPartnerValue = cuidForPartner[0]?.ID;
+ 
+        const ProjectTarget = isActive ? ProjectAssignments : ProjectAssignments.drafts;
+ 
         const assignedProjects = await SELECT
-            .from(ProjectAssignments)
+            .from(ProjectTarget)
             .columns('projectId')
-            .where({
-                partner_ID: cuidForPartnerValue
-            });
-        console.log('assignedProjects:', assignedProjects);
+            .where({ partner_ID: partnerID });
+ 
+        const allProjects = await SELECT.from(ProjectMaster).where({ status: 'A' });
+ 
+        console.log('[DEBUG findSelectedProjects] assignedProjects:', assignedProjects, '| allProjects count:', allProjects.length);
+ 
         const assignedProjectIDs = assignedProjects.map(p => p.projectId);
-        // if(!assignedProjectIDs.length) {
-        //     return SELECT.from('ProjectMaster').where({status: 'A'});
-        // }
-        // const unassignedProjects = await SELECT
-        //     .from('ProjectMaster')
-        //     .where({
-        //         projectId: { not: { in: assignedProjectIDs } },
-        //         status: 'A'
-        //     });
-        // console.log('unassignedProjects:', unassignedProjects);
-        const allProjects = await SELECT
-            .from('ProjectMaster')
-            .where({ status: 'A' });
-
-        const result = allProjects.map(project => ({
+        return allProjects.map(project => ({
             ...project,
             selected: assignedProjectIDs.includes(project.projectId)
         }));
-        return result;
     });
     srv.on('searchUsers', async (req) => {
         const searchTerm =
