@@ -131,6 +131,30 @@
                       "showCounts": true
                     }
                   }
+                },
+                "@com.sap.vocabularies.UI.v1.SelectionFields": {
+                  "filterFields": {
+                    "CustomerID": {
+                      "label": "{i18n>customerId}",
+                      "property": "customers/partnerId",
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustFilter",
+                      "required": false,
+                      "position": {
+                        "placement": "After",
+                        "anchor": "email"
+                      }
+                    },
+                    "SupplierID": {
+                      "label": "{i18n>supplierId}",
+                      "property": "suppliers/partnerId",
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.SuppFilter",
+                      "required": false,
+                      "position": {
+                        "placement": "Before",
+                        "anchor": "CustomerID"
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -159,7 +183,7 @@
                     "CustMngProjColumn": {
                       "header": "Manage",
                       "position": {
-                        "anchor": "DataField::partnerName",
+                        "anchor": "ProjectsColumn",
                         "placement": "After"
                       },
                       "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustMngProjColumn"
@@ -167,10 +191,18 @@
                     "ProjectsColumn": {
                       "header": "Projects",
                       "position": {
-                        "anchor": "CustMngProjColumn",
-                        "placement": "Before"
+                        "anchor": "CustNameColumn",
+                        "placement": "After"
                       },
                       "template": "hpbuysell.mdm.usermgmtui.ext.fragment.ProjectsColumn"
+                    },
+                    "CustNameColumn": {
+                      "header": "Customer Name",
+                      "position": {
+                        "anchor": "DataField::partnerId",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustNameColumn"
                     }
                   }
                 },
@@ -188,7 +220,7 @@
                     "SuppMngProjColumn": {
                       "header": "Manage",
                       "position": {
-                        "anchor": "DataField::partnerName",
+                        "anchor": "SuppProjectsColumn",
                         "placement": "After"
                       },
                       "template": "hpbuysell.mdm.usermgmtui.ext.fragment.SuppMngProjColumn"
@@ -196,10 +228,18 @@
                     "SuppProjectsColumn": {
                       "header": "Projects",
                       "position": {
-                        "anchor": "SuppMngProjColumn",
-                        "placement": "Before"
+                        "anchor": "CustNameColumn",
+                        "placement": "After"
                       },
                       "template": "hpbuysell.mdm.usermgmtui.ext.fragment.SuppProjectsColumn"
+                    },
+                    "CustNameColumn": {
+                      "header": "Supplier Name",
+                      "position": {
+                        "anchor": "DataField::partnerId",
+                        "placement": "After"
+                      },
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustNameColumn"
                     }
                   }
                 }

@@ -119,6 +119,43 @@ module.exports = (srv) => {
                     'Partner assignment not found'
                 );
             }
+
+            /*
+             * Once a Customer/Supplier assignment is created, its
+             * identity fields must never change. Only the nested
+             * projects (a separate entity, ProjectAssignments) may be
+             * updated - that's handled entirely by the ProjectAssignments
+             * validation below and is unaffected by this check.
+             */
+            if (
+                'partnerType' in req.data &&
+                req.data.partnerType !== existingAssignment.partnerType
+            ) {
+                return req.reject(
+                    400,
+                    'Partner Type cannot be changed once created'
+                );
+            }
+
+            if (
+                'partnerId' in req.data &&
+                req.data.partnerId !== existingAssignment.partnerId
+            ) {
+                return req.reject(
+                    400,
+                    'Partner ID cannot be changed once created'
+                );
+            }
+
+            if (
+                'partnerName' in req.data &&
+                req.data.partnerName !== existingAssignment.partnerName
+            ) {
+                return req.reject(
+                    400,
+                    'Partner Name cannot be changed once created'
+                );
+            }
         }
 
         const finalPartnerType =

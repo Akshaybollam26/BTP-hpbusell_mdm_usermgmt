@@ -1,0 +1,16 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+    <MultiInput
+        id="CustomerFilterMultiInput"
+        width="100%"
+        placeholder="Select Customers"
+        showValueHelp="true"
+        core:require="{handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustFilter'}"
+        valueHelpRequest="handler.onValueHelpRequest"
+        tokenUpdate="handler.onTokenUpdate"
+        value="{
+            path: 'filterValues>',
+            type: 'sap.fe.macros.filter.type.Value',
+            formatOptions: { operator: 'hpbuysell.mdm.usermgmtui.ext.fragment.CustFilter.filterItems' }
+        }">
+    </MultiInput>
+</core:FragmentDefinition>

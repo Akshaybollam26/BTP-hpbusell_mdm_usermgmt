@@ -6,14 +6,26 @@
         title="Manage Projects"
         contentWidth="55%" contentHeight="60%">
         <content>
-            <!-- <Text text="Manage Projects" class="sapUiSmallMarginBottom sapUiSmallMarginTop sapUiTinyMarginBegin sapUiTinyMarginEnd"/> -->
-            <SearchField
-                width="95%"
-                class ="sapUiTinyMargin"
-                placeholder="Search Project Id..."
-                liveChange="handler.onSearchProjects"
-                core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}"/>
-            <Table items="{projects>/}" mode="MultiSelect" width="100%">
+            <Toolbar>
+                <SearchField
+                    width="100%"
+                    liveChange="handler.onSearchProjects"
+                    core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}"/>
+
+                <ToolbarSpacer/>
+
+                <Button
+                    text="Select All"
+                    press="handler.onSelectAll"
+                    core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}"/>
+
+                <Button
+                    text="Clear All"
+                    visible="{ui>/showClearButton}"
+                    press="handler.onClearAll"
+                    core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn'}"/>
+            </Toolbar>
+            <Table id="projectsTable" items="{projects>/}" mode="MultiSelect" width="100%" includeItemInSelection="true">
                 <columns>
                     <Column>
                         <Text text="Project ID"/>

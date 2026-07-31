@@ -137,22 +137,12 @@ annotate service.PartnerAssignments with @(
             Value : partnerId,
             Label : 'Customer ID',
         },
-        {
-            $Type : 'UI.DataField',
-            Value : partnerName,
-            Label : 'Customer Name',
-        },
     ],
     UI.LineItem #Suppliers: [
         {
             $Type : 'UI.DataField',
             Value : partnerId,
             Label : 'Supplier ID',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : partnerName,
-            Label : 'Supplier Name',
         },
     ]
 );
@@ -190,9 +180,21 @@ annotate service.PartnerAssignments:partnerId with @(
                 ValueListProperty : 'partnerType',
                 LocalDataProperty : partnerType,
             },
+            {
+                $Type: 'Common.ValueListParameterIn',
+                ValueListProperty: 'userEmail',
+                LocalDataProperty: ID,
+            },
         ]
     },
     Common.ValueListWithFixedValues : false,
+);
+
+annotate service.BusinessPartnerVH with @(
+    UI.SelectionFields: [
+        partnerId,
+        partnerName
+    ]
 );
 // annotate service.Users:suppliers.partnerId with @(
 //   Common.Label: 'Supplier ID',
@@ -245,3 +247,21 @@ annotate service.ChangeLogs with @(
         },
     ]
 );
+
+annotate service.Users with {
+    email @(
+        Common.ValueList : {
+            $Type : 'Common.ValueListType',
+            CollectionPath : 'Users',
+            Parameters : [
+                {
+                    $Type : 'Common.ValueListParameterInOut',
+                    LocalDataProperty : email,
+                    ValueListProperty : 'email',
+                },
+            ],
+        },
+        Common.ValueListWithFixedValues : false,
+    )
+};
+

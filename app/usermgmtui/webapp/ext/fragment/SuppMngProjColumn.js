@@ -1,9 +1,10 @@
 sap.ui.define([
+    "sap/ui/core/Fragment",
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
     "sap/ui/model/FilterOperator"
-], function (MessageToast, JSONModel, Filter, FilterOperator) {
+], function (Fragment, MessageToast, JSONModel, Filter, FilterOperator) {
     'use strict';
 
     return {
@@ -19,6 +20,12 @@ sap.ui.define([
             // const oContext = oEvent.getSource().getBindingContext();
             this._oPartnerAssignmentContext = oEvent.getSource().getBindingContext();
             const oPartner = this._oPartnerAssignmentContext.getObject();
+
+            // Partner has not been selected yet
+            if (!oPartner.partnerId || !oPartner.ID) {
+                MessageToast.show("Please select a partner before managing projects.");
+                return;
+            }
             const sPartnerId = oPartner.partnerId;
             this._sPartnerUuid = oPartner.ID;
             const isActiveEntity = oPartner.IsActiveEntity !== false;
@@ -53,11 +60,11 @@ sap.ui.define([
             }
             this._oManageProjectsDialog.open();
         },
-        onSearchProjects: async function(oEvent){
+        onSearchProjects: async function (oEvent) {
             const sValue = oEvent.getParameter("newValue");
-            const oTable = oEvent.getSource().getParent().getContent()[1];  
+            const oTable = oEvent.getSource().getParent().getContent()[1];
             // SearchField is first child, Table is second
- 
+
             const oBinding = oTable.getBinding("items");
             if (!sValue) {
                 oBinding.filter([]);
@@ -70,15 +77,15 @@ sap.ui.define([
         onOkProjects: async function (oEvent) {
             var oController = this._controller;
             var oModel = oController.getView().getModel();
- 
+
             const aChangedProjectList = oController.getView().getModel("projects").oData;
             const aSelectedProjectsIds = aChangedProjectList.filter(p => p.selected === true).map(p => p.projectId);
             const aUnselectedProjectsIds = aChangedProjectList.filter(p => p.selected === false).map(p => p.projectId);
             const aInitialSelectedProjectIds = this._aInitialProjectsList.filter(p => p.selected === true).map(p => p.projectId);
- 
+
             const aProjectsToAdd = aSelectedProjectsIds.filter(id => !aInitialSelectedProjectIds.includes(id));
             const aProjectsToRemove = aUnselectedProjectsIds.filter(id => aInitialSelectedProjectIds.includes(id));
- 
+
             const isActiveEntity = this._oPartnerAssignmentContext.getObject().IsActiveEntity !== false;
             debugger;
             try {
@@ -88,7 +95,7 @@ sap.ui.define([
                         .setParameter("isActiveEntity", isActiveEntity)
                         .setParameter("projectIds", aProjectsToAdd)
                         .execute();
- 
+
                     await this._oPartnerAssignmentContext.requestSideEffects([{ $NavigationPropertyPath: "projects" }]);
                 }
                 if (aProjectsToRemove.length) {
@@ -97,7 +104,7 @@ sap.ui.define([
                         .setParameter("isActiveEntity", isActiveEntity)
                         .setParameter("projectIds", aProjectsToRemove)
                         .execute();
- 
+
                     await this._oPartnerAssignmentContext.requestSideEffects([{ $NavigationPropertyPath: "projects" }]);
                 }
                 MessageToast.show("Projects updated successfully");
@@ -106,10 +113,55 @@ sap.ui.define([
                 console.error(oError);
                 return;
             }
- 
+
             this._oManageProjectsDialog.close();
             this._oManageProjectsDialog.destroy();
             this._oManageProjectsDialog = null;
+        }, 
+        onSelectAll: function (oEvent) {
+            // 1. Get the table reference relative to the button event
+            const oButton = oEvent.getSource();
+            const oDialog = oButton.getParent().getParent(); // Toolbar -> Content -> Dialog
+            const oTable = oDialog.getContent()[1]; // Index 1 is the Table
+
+            if (oTable) {
+                // Select all rows in the UI table control
+                oTable.selectAll();
+            }
+
+            // 2. Sync the underlying JSON model data
+            const oController = this._controller;
+            const oModel = oController.getView().getModel("projects");
+
+            if (oModel) {
+                const aData = oModel.getData();
+                if (Array.isArray(aData)) {
+                    aData.forEach(function (oProject) {
+                        oProject.selected = true;
+                    });
+                    oModel.refresh(true);
+                }
+            }
+        },
+        onClearAll: function (oEvent) {
+            const oButton = oEvent.getSource();
+            const oDialog = oButton.getParent().getParent();
+            const oTable = oDialog.getContent()[1]; 
+            console.log(oTable);
+            if (oTable) {
+                oTable.removeSelections(true);
+            }
+            const oController = this._controller;
+            const oModel = oController.getView().getModel("projects");
+            if (oModel) {
+                const aData = oModel.getData();
+                if (Array.isArray(aData)) {
+                    aData.forEach(function (oProject) {
+                        oProject.selected = false;
+                    });
+                    oModel.refresh(true);
+                }
+            }
         },
         onCancelDialog: function (oEvent) {
             this._oManageProjectsDialog.close();

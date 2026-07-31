@@ -1,15 +1,15 @@
 using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
  
  
-service UserManagementService @(path: '/user-management')  @(require: 'authenticated-user') {
+service UserManagementService @(path: '/user-management')@(require: 'authenticated-user') {
     @odata.singleton  @cds.persistence.skip
  
     entity auth {
- 
-        key ID                              : String;
-            canCreate                       : Boolean;
-            canUpdate                       : Boolean;
-            canDelete                       : Boolean; 
+
+        key ID        : String;
+            canCreate : Boolean;
+            canUpdate : Boolean;
+            canDelete : Boolean;
     }
 
     @restrict: [
@@ -30,7 +30,7 @@ service UserManagementService @(path: '/user-management')  @(require: 'authentic
         }
  
     ]
-    
+ 
     @odata.draft.enabled
     @(Capabilities: {
         InsertRestrictions: {Insertable: true},
@@ -65,27 +65,43 @@ service UserManagementService @(path: '/user-management')  @(require: 'authentic
     entity BusinessPartnerVH  as
             select from CustomerMaster {
                 key customerId   as partnerId,
+                    customerId   as customerId,
+                    cast(
+                        null as String(10)
+                    )            as supplierId,
                     customerName as partnerName,
                     cast(
                         'C' as String(1)
-                    )            as partnerType
+                    )            as partnerType,
+                    cast(
+                        null as String(241)
+                    )            as userEmail
             }
+
         union all
+
             select from SupplierMaster {
                 key supplierId   as partnerId,
+                    cast(
+                        null as String(10)
+                    )            as customerId,
+                    supplierId   as supplierId,
                     supplierName as partnerName,
                     cast(
                         'S' as String(1)
-                    )            as partnerType
+                    )            as partnerType,
+                    cast(
+                        null as String(241)
+                    )            as userEmail
             };
  
     function searchUsers(searchTerm: String)                                                       returns array of Users;
-    function getUnassignedCustomers(userEmail: String)                                             returns array of CustomerMaster;
-    function getUnassignedSuppliers(userEmail: String)                                             returns array of SupplierMaster;
+    function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;
+    function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierMaster;
     // function findSelectedProjects(userEmail: String, partnerId: String)
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectMaster;
- 
+
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
- 
+
 }

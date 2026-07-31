@@ -45,11 +45,29 @@ entity PartnerAssignments : cuid {
 
     partnerId   : String(20)
     @title: '{i18n>PartnerId}'
-    @mandatory;
+    @mandatory
+    @cds.odata.valuelist
+    @Common.FieldControl: { 
+        $edmJson: { 
+            $If: [ 
+                { $Path: 'HasActiveEntity' }, 
+                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly' }, 
+                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional' } 
+            ] 
+        } 
+    };
 
     partnerName : String(100)
-    @title: '{i18n>PartnerName}';
-    @Core.Computed
+    @title: '{i18n>PartnerName}'
+    @Common.FieldControl: { 
+        $edmJson: { 
+            $If: [ 
+                { $Path: 'HasActiveEntity' }, 
+                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly' }, 
+                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional' } 
+            ] 
+        } 
+    };
 
     projects    : Composition of many ProjectAssignments
                       on projects.partner = $self;
