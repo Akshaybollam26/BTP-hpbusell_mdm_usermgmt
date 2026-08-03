@@ -8,6 +8,8 @@ modules:
     path: gen/srv
     requires:
       - name: uaa_BTP-hpbuysell_mdm_UserMgmt
+      - name: BTP-hpbuysell_mdm_UserMgmt-destination-service
+      - name: BTP-hpbuysell_mdm_UserMgmt-connectivity
     provides:
       - name: srv-api
         properties:
@@ -129,6 +131,11 @@ resources:
             description: 'generated'
             role-template-references:
               - '$XSAPPNAME.UsermgmtManage'
+  - name: BTP-hpbuysell_mdm_UserMgmt-connectivity
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: connectivity
+      service-plan: lite
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

@@ -1,10 +1,14 @@
 const cds = require('@sap/cds');
-
+const { executeHttpRequest } = require('@sap-cloud-sdk/http-client');
+const axios = require("axios");
+const { SELECT, UPDATE } = require('@sap/cds/lib/ql/cds-ql');
 module.exports = (srv) => {
     const {
         PartnerAssignments,
         ProjectAssignments,
-        ProjectMaster
+        ProjectMaster ,
+        Users,
+        UserGroups
     } = srv.entities;
 
     /*
@@ -134,6 +138,175 @@ module.exports = (srv) => {
 
         return true;
     });
+
+
+    srv.on('syncusers', async (req) => {
+        //1. fetch all users who belong to buysell group thru partial search
+        //handle pagination
+        const buysellcount = await executeHttpRequest(
+            { destinationName: 'IAS_SCIM' },
+            {
+                method: 'GET',
+                url: `/scim/Users?filter=groups.display co "BuySell"&count=1`,
+
+                headers: {
+                    Accept: 'application/scim+json'
+                }
+            }
+        );
+        const grpcount = buysellcount.data.totalResults;
+        // const grpcount = 1;
+        console.log("grp count", grpcount);
+        const buysellgrps = await executeHttpRequest(
+            { destinationName: 'IAS_SCIM' },
+            {
+                method: 'GET',
+                url: `/scim/Users?filter=groups.display co "BuySell"&count=${grpcount}`,
+                //url: `/scim/Users?count=250`,
+                headers: {
+                    Accept: 'application/scim+json'
+                }
+            }
+        );
+        // 2. construct a users payload for further operations
+
+        const usersinfo = buysellgrps.data.Resources.map(user => ({
+
+            email: user.emails?.find(e => e.primary)?.value
+                ?? user.emails?.[0]?.value,
+
+            firstName: user.name?.givenName,
+
+            lastName: user.name?.familyName,
+
+            displayName: user.displayName,
+
+            userName: user.userName,
+
+            active: user.active,
+
+            userType: user.userType,
+
+            locale: user.locale,
+
+            preferredLanguage: user.preferredLanguage,
+
+            timeZone: user.timeZone,
+
+            groups: (user.groups || []).map(group => ({
+                groupId: group.value,
+                groupName: group.display
+            }))
+
+        }));
+
+        console.log(JSON.stringify(usersinfo, null, 2));
+        // 3. go by one by one user , 
+
+        const existingUsers = await SELECT.from(Users); //fetching all users
+        //.where({
+        //  active: true
+        // });
+        const existingUsersMap = new Map(
+            existingUsers.map(user => [user.email, user])
+        );
+
+        for (const user of usersinfo) {
+            //1. if that user is not available in our DB , create a new user along with their usergroups
+            const existingUser = existingUsersMap.get(user.email);
+            if (!existingUser) {
+
+                await INSERT.into(Users).entries(user);
+
+                console.log(`Inserted new user ${user.email}`);
+
+                continue;
+            }
+            // 2. if that user is already there :
+            //a. 1. check if the userinfo is updated or not , for users , only active status , first name , last name are modifiable. if no changes don't make update call to that particular user
+            const userChanged =
+                existingUser.active !== user.active ||
+                existingUser.firstName !== user.firstName ||
+                existingUser.lastName !== user.lastName;
+
+            if (userChanged) {
+                //update the users. 
+                await UPDATE(Users).set({
+                    active: user.active,
+                    firstName: user.firstName,
+                    lastName: user.lastName
+                }).where({ email: user.email });
+
+            }
+            if (!user.active) {
+
+                await DELETE.from(UserGroups)
+                    .where({
+                        user_email: user.email
+                    });
+
+                // TODO:
+                // DELETE Projects
+                // DELETE ProjectAssignments
+
+                continue;
+            }
+            //DB groups
+            const existingGroups = await SELECT.from(UserGroups).where({
+                user_email: user.email
+            });
+            const dbGroupMap = new Map(
+                existingGroups.map(g => [g.groupId, g.groupName])
+            );
+
+            const scimGroupMap = new Map(
+                (user.groups || []).map(g => [g.groupId, g.groupName])
+            );
+
+            for (const [groupId, scimGroup] of scimGroupMap) {
+
+                const dbGroup = dbGroupMap.get(groupId);
+
+                // New group
+                if (!dbGroup) {
+
+                    await INSERT.into(UserGroups).entries({
+                        user: {
+                            email: user.email
+                        },
+                        groupId: groupId,
+                        groupName: scimGroup
+                    });
+
+                    continue;
+                }
+
+                // Group name changed
+                if (dbGroup.groupName !== scimGroup.groupName) {
+
+                    await UPDATE(UserGroups)
+                        .set({
+                            groupName: scimGroup.groupName
+                        })
+                        .where({
+                            user_email: user.email,
+                            groupId: groupId
+                        });
+                }
+            }
+            for (const [groupId] of dbGroupMap) {
+
+                if (!scimGroupMap.has(groupId)) {
+
+                    await DELETE.from(UserGroups)
+                        .where({
+                            user_email: user.email,
+                            groupId: groupId
+                        });
+                }
+            }
+        }
+    })
 
 
     /*

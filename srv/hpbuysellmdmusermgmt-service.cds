@@ -1,7 +1,10 @@
 using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
  
  
-service UserManagementService @(path: '/user-management')@(require: 'authenticated-user') {
+service UserManagementService 
+@(path: '/user-management')
+//@(require: 'authenticated-user')
+ {
     @odata.singleton  @cds.persistence.skip
  
     entity auth {
@@ -94,7 +97,7 @@ service UserManagementService @(path: '/user-management')@(require: 'authenticat
                         null as String(241)
                     )            as userEmail
             };
- 
+    entity UserGroups as projection on db.UserGroups;
     function searchUsers(searchTerm: String)                                                       returns array of Users;
     function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;
     function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierMaster;
@@ -103,5 +106,6 @@ service UserManagementService @(path: '/user-management')@(require: 'authenticat
 
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
+    action syncusers(); 
 
 }
