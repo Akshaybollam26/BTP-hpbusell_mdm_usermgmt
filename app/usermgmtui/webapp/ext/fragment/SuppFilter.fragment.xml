@@ -2,7 +2,6 @@
     <MultiInput
         id="SupplierFilterMultiInput"
         width="100%"
-        placeholder="Select Suppliers"
         showValueHelp="true"
         core:require="{handler:'hpbuysell/mdm/usermgmtui/ext/fragment/SuppFilter'}"
         valueHelpRequest="handler.onValueHelpRequest"

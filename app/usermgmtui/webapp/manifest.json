@@ -129,7 +129,8 @@
                     "type": "ResponsiveTable",
                     "quickVariantSelection": {
                       "showCounts": true
-                    }
+                    },
+                    "beforeRebindTable": ".extension.hpbuysell.mdm.usermgmtui.ext.controller.ExtForListReportPage.onBeforeRebindTable"
                   }
                 },
                 "@com.sap.vocabularies.UI.v1.SelectionFields": {
@@ -151,6 +152,16 @@
                       "required": false,
                       "position": {
                         "placement": "Before",
+                        "anchor": "CustomerID"
+                      }
+                    },
+                    "filterbarFieldForProjects": {
+                      "label": "Project Id",
+                      "property": "customers/user_email",
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.FilterbarFieldForProjects",
+                      "required": false,
+                      "position": {
+                        "placement": "After",
                         "anchor": "CustomerID"
                       }
                     }
@@ -254,6 +265,9 @@
         "sap.ui.controllerExtensions": {
           "sap.fe.templates.ObjectPage.ObjectPageController": {
             "controllerName": "hpbuysell.mdm.usermgmtui.ext.controller.CustomControllerForObjPage"
+          },
+          "sap.fe.templates.ListReport.ListReportController": {
+            "controllerName": "hpbuysell.mdm.usermgmtui.ext.controller.ExtForListReportPage"
           }
         }
       }

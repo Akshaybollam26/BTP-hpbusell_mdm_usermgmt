@@ -2,7 +2,6 @@
     <MultiInput
         id="CustomerFilterMultiInput"
         width="100%"
-        placeholder="Select Customers"
         showValueHelp="true"
         core:require="{handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustFilter'}"
         valueHelpRequest="handler.onValueHelpRequest"

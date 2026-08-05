@@ -188,6 +188,7 @@ annotate service.PartnerAssignments:partnerId with @(
         ]
     },
     Common.ValueListWithFixedValues : false,
+    Common.ValueListForValidation : true,
 );
 
 annotate service.BusinessPartnerVH with @(

@@ -75,6 +75,38 @@ module.exports = (srv) => {
         }
     });
 
+    //validate that each partner profile have some project managed
+    srv.before("SAVE", Users.drafts, async (req) => {
+        const sUserEmail = req.data.email;
+        // Get all partner assignments currently present in the User draft
+        const userRecord = await SELECT.one.from(Users).where({email: sUserEmail});
+        // console.log(userRecord); 
+        //validate if editor is from finance group - Y? let them save without validation
+        // if(userRecord.userGroup === "CUST_FINANCE_GRP_VIEWER"){ uncomment when ready
+        //     return;
+        // }
+        const aPartners = await SELECT
+            .from(PartnerAssignments.drafts)
+            .columns("ID", "partnerId", "partnerType")
+            .where({
+                user_email: sUserEmail
+            });
+        //get projects of each partner - stop wherever validation fails(atleast one proj is mandatory before saving)
+        for (const oPartner of aPartners) {
+            const aProjects = await SELECT
+                .from(ProjectAssignments.drafts)
+                .columns("ID")
+                .where({
+                    partner_ID: oPartner.ID
+                });
+            if (aProjects.length === 0) {
+                req.error(
+                    400,
+                    `Please assign at least one project to partner profile ${oPartner.partnerId}.`
+                );
+            }
+        }
+    });
 
     /*
      * PARTNER ASSIGNMENT VALIDATIONS

@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/m/MessageToast",
     "sap/ui/model/json/JSONModel",
     "sap/ui/model/Filter",
-    "sap/ui/model/FilterOperator"
-], function (Fragment, MessageToast, JSONModel, Filter, FilterOperator) {
+    "sap/ui/model/FilterOperator",
+    "sap/m/Token"
+], function (Fragment, MessageToast, JSONModel, Filter, FilterOperator, Token) {
     'use strict';
 
     return {
@@ -167,6 +168,57 @@ sap.ui.define([
             this._oManageProjectsDialog.close();
             this._oManageProjectsDialog.destroy();
             this._oManageProjectsDialog = null;
+        },
+        onVHRequestForProjects: async function(oEvent){
+            this._multiInputField = oEvent.getSource();
+            if (!this.vhdForProjectsFilter) {
+                this.vhdForProjectsFilter = await this.loadFragment({
+                    name: "hpbuysell.mdm.usermgmtui.ext.fragment.VHDForProjectsFbField"
+                });
+            }
+            this.vhdForProjectsFilter.open();
+        },
+        onTokenUpdate :  function(oEvent){
+            debugger;
+            var oMultiInput = oEvent.getSource();
+            if (oEvent.getParameter("type") !== "added") { 
+                return;
+            } 
+            var aAddedTokens = oEvent.getParameter("addedTokens") || []; 
+            aAddedTokens.forEach(function (oToken) { 
+                var sText = oToken.getText(); 
+                if (!sText) { 
+                    return; 
+                } 
+                if (!oToken.getKey()) { 
+                    oToken.setKey(sText); 
+                } 
+            });
+        },
+        vhdForProjects_onOK: function(oEvent){
+            const oTable = this.vhdForProjectsFilter.getContent()[0];
+            const aSelectedItems = oTable.getSelectedItems();
+ 
+            const aTokens = aSelectedItems.map(oItem => {
+                const sId = oItem.getCells()[0].getText();
+                const sName = oItem.getCells()[1].getText();
+                return new Token({ key: sId, text: sId });
+            });
+ 
+            this._multiInputField.setTokens(aTokens);
+            // this._updateFilterValue(aTokens);
+            const sValue = aTokens.map(t => t.getKey()).join(",");
+            //this._oMultiInput.setValue(sValue); // triggers the "Value" type conversion -> filterItems()
+ 
+            this.vhdForProjectsFilter.close();
+            this.vhdForProjectsFilter.destroy();
+            this.vhdForProjectsFilter = null;
+        },
+        vhdForProjects_onCancel: function(oEvent){
+            debugger;
+            this.vhdForProjectsFilter.close();
+            this.vhdForProjectsFilter.destroy();
+            this.vhdForProjectsFilter = null;
         }
     };
 });
