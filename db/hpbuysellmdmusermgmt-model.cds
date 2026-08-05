@@ -1,34 +1,47 @@
 namespace hpbuysell.mdm.usermgmt;
 
-using {cuid, managed} from '@sap/cds/common';
+using {
+    cuid,
+    managed
+} from '@sap/cds/common';
+
 /**
  * Primary entity: application Users
  * Email is the business key. Only firstName/lastName may
  * be changed once a record has been created.
  */
-entity Users : managed{
+entity Users : managed {
 
-    key email      : String(241)
+    key email             : String(241)
         @title: '{i18n>Email}';
 
-        firstName  : String(100)
+        firstName         : String(100)
         @title: '{i18n>FirstName}'
         @mandatory;
 
-        lastName   : String(100)
+        lastName          : String(100)
         @title: '{i18n>LastName}'
         @mandatory;
+        displayName       : String(100);
+        userName          : String(100);
+        active            : Boolean default true;
 
-        customers  : Composition of many PartnerAssignments
-                         on  customers.user        = $self
-                         and customers.partnerType = 'C';
+        userType          : String(50);
+        locale            : String(20);
+        preferredLanguage : String(20);
+        timeZone          : String(100);
+        customers         : Composition of many PartnerAssignments
+                                on  customers.user        = $self
+                                and customers.partnerType = 'C';
 
-        suppliers  : Composition of many PartnerAssignments
-                         on  suppliers.user        = $self
-                         and suppliers.partnerType = 'S';
+        suppliers         : Composition of many PartnerAssignments
+                                on  suppliers.user        = $self
+                                and suppliers.partnerType = 'S';
 
-        changeLogs : Composition of many ChangeLogs
-                         on changeLogs.user = $self;
+        changeLogs        : Composition of many ChangeLogs
+                                on changeLogs.user = $self;
+        groups            : Composition of many UserGroups
+                                on groups.user = $self;
 }
 
 
@@ -44,30 +57,22 @@ entity PartnerAssignments : cuid {
     };
 
     partnerId   : String(20)
-    @title: '{i18n>PartnerId}'
+    @title              : '{i18n>PartnerId}'
     @mandatory
     @cds.odata.valuelist
-    @Common.FieldControl: { 
-        $edmJson: { 
-            $If: [ 
-                { $Path: 'HasActiveEntity' }, 
-                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly' }, 
-                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional' } 
-            ] 
-        } 
-    };
+    @Common.FieldControl: {$edmJson: {$If: [
+        {$Path: 'HasActiveEntity'},
+        {$EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly'},
+        {$EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional'}
+    ]}};
 
     partnerName : String(100)
-    @title: '{i18n>PartnerName}'
-    @Common.FieldControl: { 
-        $edmJson: { 
-            $If: [ 
-                { $Path: 'HasActiveEntity' }, 
-                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly' }, 
-                { $EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional' } 
-            ] 
-        } 
-    };
+    @title              : '{i18n>PartnerName}'
+    @Common.FieldControl: {$edmJson: {$If: [
+        {$Path: 'HasActiveEntity'},
+        {$EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/ReadOnly'},
+        {$EnumMember: 'com.sap.vocabularies.Common.v1.FieldControlType/Optional'}
+    ]}};
 
     projects    : Composition of many ProjectAssignments
                       on projects.partner = $self;
@@ -150,4 +155,15 @@ entity ProjectMaster {
         @title: '{i18n>ProjectName}';
 
         status      : String(1);
+}
+
+entity UserGroups : managed {
+
+    key user      : Association to Users;
+    key groupId   : String;
+
+
+        groupName : String(255);
+
+
 }
