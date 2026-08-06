@@ -1,3 +1,5 @@
+const { SELECT } = require("@sap/cds/lib/ql/cds-ql");
+
 module.exports = (srv) => {
     const {
         Users,

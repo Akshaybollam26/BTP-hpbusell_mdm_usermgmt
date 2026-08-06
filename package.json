@@ -31,6 +31,18 @@
   ],
   "cds": {
     "requires": {
+       "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "url": "db.sqlite"
+        }
+      },
+       "IAS_SCIM": {
+        "kind": "rest",
+        "credentials": {
+          "destination": "IAS_SCIM"
+        }
+      },
       "[production]": {
         "auth": "xsuaa",
         "destinations": true,

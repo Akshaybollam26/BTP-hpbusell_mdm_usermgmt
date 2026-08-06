@@ -40,7 +40,11 @@ service UserManagementService
         DeleteRestrictions: {Deletable: true},
         UpdateRestrictions: {Updatable: true}
     })
-    entity Users              as projection on db.Users;
+    entity Users              as projection on db.Users
+    
+    actions{
+         action deactivateUser();
+    };
  
     entity PartnerAssignments as projection on db.PartnerAssignments;
  
@@ -107,5 +111,6 @@ service UserManagementService
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
     action syncusers(); 
+    action deactivateUser();
 
 }
