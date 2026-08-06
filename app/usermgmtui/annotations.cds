@@ -1,6 +1,10 @@
 using UserManagementService as service from '../../srv/hpbuysellmdmusermgmt-service';
 
 annotate service.Users with @(
+     Capabilities: {
+        InsertRestrictions: {Insertable: true},
+        DeleteRestrictions: {Deletable: true}
+    },
     UI.HeaderInfo : {
         TypeName : 'User',
         TypeNamePlural : 'Users',

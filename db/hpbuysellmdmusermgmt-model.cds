@@ -12,36 +12,37 @@ using {
  */
 entity Users : managed {
 
-    key email             : String(241)
+    key email              : String(241)
         @title: '{i18n>Email}';
 
-        firstName         : String(100)
+        firstName          : String(100)
         @title: '{i18n>FirstName}'
         @mandatory;
 
-        lastName          : String(100)
+        lastName           : String(100)
         @title: '{i18n>LastName}'
         @mandatory;
-        displayName       : String(100);
-        userName          : String(100);
-        active            : Boolean default true;
+        displayName        : String(100);
+        userName           : String(100);
+        active             : Boolean default true;
 
-        userType          : String(50);
-        locale            : String(20);
-        preferredLanguage : String(20);
-        timeZone          : String(100);
-        customers         : Composition of many PartnerAssignments
-                                on  customers.user        = $self
-                                and customers.partnerType = 'C';
+        userType           : String(50);
+        locale             : String(20);
+        preferredLanguage  : String(20);
+        timeZone           : String(100);
+        UserGroupIndicator : String(2);
+        customers          : Composition of many PartnerAssignments
+                                 on  customers.user        = $self
+                                 and customers.partnerType = 'C';
 
-        suppliers         : Composition of many PartnerAssignments
-                                on  suppliers.user        = $self
-                                and suppliers.partnerType = 'S';
+        suppliers          : Composition of many PartnerAssignments
+                                 on  suppliers.user        = $self
+                                 and suppliers.partnerType = 'S';
 
-        changeLogs        : Composition of many ChangeLogs
-                                on changeLogs.user = $self;
-        groups            : Composition of many UserGroups
-                                on groups.user = $self;
+        changeLogs         : Composition of many ChangeLogs
+                                 on changeLogs.user = $self;
+        groups             : Composition of many UserGroups
+                                 on groups.user = $self;
 }
 
 

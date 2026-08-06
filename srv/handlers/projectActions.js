@@ -6,7 +6,7 @@ module.exports = (srv) => {
     const {
         PartnerAssignments,
         ProjectAssignments,
-        ProjectMaster ,
+        ProjectMaster,
         Users,
         UserGroups
     } = srv.entities;
@@ -170,46 +170,67 @@ module.exports = (srv) => {
         );
         // 2. construct a users payload for further operations
 
-        const usersinfo = buysellgrps.data.Resources.map(user => ({
+        const usersinfo = buysellgrps.data.Resources.map(user => {
 
-            email: user.emails?.find(e => e.primary)?.value
-                ?? user.emails?.[0]?.value,
-
-            firstName: user.name?.givenName,
-
-            lastName: user.name?.familyName,
-
-            displayName: user.displayName,
-
-            userName: user.userName,
-
-            active: user.active,
-
-            userType: user.userType,
-
-            locale: user.locale,
-
-            preferredLanguage: user.preferredLanguage,
-
-            timeZone: user.timeZone,
-
-            groups: (user.groups || []).map(group => ({
+            const groups = (user.groups || []).map(group => ({
                 groupId: group.value,
                 groupName: group.display
-            }))
+            }));
 
-        }));
+            const hasCustomer = groups.some(g =>
+                g.groupName.toLowerCase().includes("customer")
+            );
 
-        console.log(JSON.stringify(usersinfo, null, 2));
+            const hasSupplier = groups.some(g =>
+                g.groupName.toLowerCase().includes("supplier")
+            );
+
+            let partnerType = "HP";
+
+            if (hasCustomer && hasSupplier) {
+                partnerType = "SC";
+            } else if (hasCustomer) {
+                partnerType = "C";
+            } else if (hasSupplier) {
+                partnerType = "S";
+            }
+
+            return {
+                email: user.emails?.find(e => e.primary)?.value
+                    ?? user.emails?.[0]?.value,
+
+                firstName: user.name?.givenName,
+                lastName: user.name?.familyName,
+                active: user.active,
+                displayName: user.displayName,
+                userName: user.userName,
+                locale: user.locale,
+                preferredLanguage: user.preferredLanguage,
+                timeZone: user.timeZone,
+
+                UserGroupIndicator: partnerType,
+
+                groups
+            };
+        });
         // 3. go by one by one user , 
 
         const existingUsers = await SELECT.from(Users); //fetching all users
-        //.where({
-        //  active: true
-        // });
         const existingUsersMap = new Map(
             existingUsers.map(user => [user.email, user])
         );
+        const allGroups = await SELECT.from(UserGroups);
+        const groupsByUser = new Map();
+
+        for (const group of allGroups) {
+            const email = group.user_email;
+
+            if (!groupsByUser.has(email)) {
+                groupsByUser.set(email, []);
+            }
+
+            groupsByUser.get(email).push(group);
+        }
 
         for (const user of usersinfo) {
             //1. if that user is not available in our DB , create a new user along with their usergroups
@@ -217,9 +238,6 @@ module.exports = (srv) => {
             if (!existingUser) {
 
                 await INSERT.into(Users).entries(user);
-
-                console.log(`Inserted new user ${user.email}`);
-
                 continue;
             }
             // 2. if that user is already there :
@@ -227,14 +245,16 @@ module.exports = (srv) => {
             const userChanged =
                 existingUser.active !== user.active ||
                 existingUser.firstName !== user.firstName ||
-                existingUser.lastName !== user.lastName;
+                existingUser.lastName !== user.lastName ||
+                existingUser.UserGroupIndicator !== user.UserGroupIndicator;
 
             if (userChanged) {
                 //update the users. 
                 await UPDATE(Users).set({
                     active: user.active,
                     firstName: user.firstName,
-                    lastName: user.lastName
+                    lastName: user.lastName,
+                    UserGroupIndicator: user.UserGroupIndicator
                 }).where({ email: user.email });
 
             }
@@ -244,21 +264,15 @@ module.exports = (srv) => {
                     .where({
                         user_email: user.email
                     });
-
-                // TODO:
-                // DELETE Projects
-                // DELETE ProjectAssignments
-
+                await DELETE.from(PartnerAssignments)
+                    .where({ user_email: user.email });
                 continue;
             }
             //DB groups
-            const existingGroups = await SELECT.from(UserGroups).where({
-                user_email: user.email
-            });
+            const existingGroups = groupsByUser.get(user.email) || [];
             const dbGroupMap = new Map(
                 existingGroups.map(g => [g.groupId, g.groupName])
             );
-
             const scimGroupMap = new Map(
                 (user.groups || []).map(g => [g.groupId, g.groupName])
             );
@@ -282,11 +296,11 @@ module.exports = (srv) => {
                 }
 
                 // Group name changed
-                if (dbGroup.groupName !== scimGroup.groupName) {
+                if (dbGroup !== scimGroup) {
 
                     await UPDATE(UserGroups)
                         .set({
-                            groupName: scimGroup.groupName
+                            groupName: scimGroup
                         })
                         .where({
                             user_email: user.email,
@@ -304,6 +318,32 @@ module.exports = (srv) => {
                             groupId: groupId
                         });
                 }
+            }
+        }
+
+        const scimEmails = new Set(
+            usersinfo.map(user => user.email)
+        );
+
+        for (const dbUser of existingUsers) {
+
+            if (!scimEmails.has(dbUser.email) && dbUser.active) {
+
+                await UPDATE(Users)
+                    .set({
+                        active: false,
+                        UserGroupIndicator: ''
+                    })
+                    .where({
+                        email: dbUser.email
+                    });
+
+                await DELETE.from(UserGroups)
+                    .where({
+                        user_email: dbUser.email
+                    });
+                await DELETE.from(PartnerAssignments)
+                    .where({ user_email: dbUser.email });
             }
         }
     })
@@ -341,4 +381,18 @@ module.exports = (srv) => {
             selected: assignedProjectIDs.includes(project.projectId)
         }));
     });
+    srv.on('deactivateUser', async (req) => {
+        const useremail = req.params[0].email;
+        await UPDATE(Users).set({
+            active: false,
+            UserGroupIndicator: ''
+        }).where({ email: useremail });
+
+        await DELETE.from(UserGroups).where({ user_email: useremail })
+        await DELETE.from(PartnerAssignments)
+            .where({ user_email: useremail });
+
+
+    })
+
 };
