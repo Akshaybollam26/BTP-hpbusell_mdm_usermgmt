@@ -7,7 +7,8 @@ module.exports = (srv) => {
         ProjectAssignments,
         CustomerMaster,
         SupplierMaster,
-        ProjectMaster
+        ProjectMaster,
+        UserGroups
     } = srv.entities;
 
     /*
@@ -16,7 +17,6 @@ module.exports = (srv) => {
      * firstName / lastName are handled by @mandatory.
      * email is key, so mandatory is handled by CDS/key behavior.
      */
-
     srv.before('CREATE', Users, async (req) => {
         const { email } = req.data;
 
@@ -46,7 +46,6 @@ module.exports = (srv) => {
             }
         }
     });
-
 
     srv.before('UPDATE', Users, async (req) => {
         const email =
@@ -84,9 +83,15 @@ module.exports = (srv) => {
         const userRecord = await SELECT.one.from(Users).where({email: sUserEmail});
         // console.log(userRecord); 
         //validate if editor is from finance group - Y? let them save without validation
-        // if(userRecord.userGroup === "CUST_FINANCE_GRP_VIEWER"){ uncomment when ready
-        //     return;
-        // }
+        const userGroupRecords = await SELECT.from(UserGroups).where({user_email : sUserEmail});
+        console.log(userGroupRecords);
+        for (const each of userGroupRecords) {
+            console.log(each.groupName);
+            if (each.groupName === "HP_BUYSELL_CUSTOMER_FINANCE_VIEWER_GRP") {
+                console.log("reached here");
+                return; // exits the entire handler
+            }
+        }
         const aPartners = await SELECT
             .from(PartnerAssignments.drafts)
             .columns("ID", "partnerId", "partnerType")

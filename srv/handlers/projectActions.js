@@ -208,7 +208,7 @@ module.exports = (srv) => {
                 preferredLanguage: user.preferredLanguage,
                 timeZone: user.timeZone,
 
-                UserGroupIndicator: partnerType,
+                userGroupIndicator: partnerType,
 
                 groups
             };
@@ -246,7 +246,7 @@ module.exports = (srv) => {
                 existingUser.active !== user.active ||
                 existingUser.firstName !== user.firstName ||
                 existingUser.lastName !== user.lastName ||
-                existingUser.UserGroupIndicator !== user.UserGroupIndicator;
+                existingUser.userGroupIndicator !== user.userGroupIndicator;
 
             if (userChanged) {
                 //update the users. 
@@ -254,7 +254,7 @@ module.exports = (srv) => {
                     active: user.active,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    UserGroupIndicator: user.UserGroupIndicator
+                    userGroupIndicator: user.userGroupIndicator
                 }).where({ email: user.email });
 
             }
@@ -332,7 +332,7 @@ module.exports = (srv) => {
                 await UPDATE(Users)
                     .set({
                         active: false,
-                        UserGroupIndicator: ''
+                        userGroupIndicator: ''
                     })
                     .where({
                         email: dbUser.email
@@ -381,18 +381,16 @@ module.exports = (srv) => {
             selected: assignedProjectIDs.includes(project.projectId)
         }));
     });
-    srv.on('deactivateUser', async (req) => {
+    srv.on('deactivateUserMain', async (req) => {
         const useremail = req.params[0].email;
+        console.log(useremail)
         await UPDATE(Users).set({
             active: false,
-            UserGroupIndicator: ''
+            userGroupIndicator: ''
         }).where({ email: useremail });
 
         await DELETE.from(UserGroups).where({ user_email: useremail })
         await DELETE.from(PartnerAssignments)
             .where({ user_email: useremail });
-
-
     })
-
 };

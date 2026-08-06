@@ -30,7 +30,7 @@ entity Users : managed {
         locale             : String(20);
         preferredLanguage  : String(20);
         timeZone           : String(100);
-        UserGroupIndicator : String(2);
+        userGroupIndicator : String(2);
         customers          : Composition of many PartnerAssignments
                                  on  customers.user        = $self
                                  and customers.partnerType = 'C';

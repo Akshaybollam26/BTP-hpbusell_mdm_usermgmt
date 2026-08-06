@@ -3,7 +3,7 @@ using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
  
 service UserManagementService 
 @(path: '/user-management')
-//@(require: 'authenticated-user')
+@(require: 'authenticated-user')
  {
     @odata.singleton  @cds.persistence.skip
  
@@ -27,23 +27,22 @@ service UserManagementService
             grant: [
                 'CREATE',
                 'UPDATE',
-                'DELETE'
+                'EXECUTE',
+                'deactivateUserMain'
             ],
             to   : 'UsermgmtManage'
         }
  
     ]
- 
     @odata.draft.enabled
     @(Capabilities: {
         InsertRestrictions: {Insertable: true},
-        DeleteRestrictions: {Deletable: true},
+        DeleteRestrictions: {Deletable: false},
         UpdateRestrictions: {Updatable: true}
     })
     entity Users              as projection on db.Users
-    
     actions{
-         action deactivateUser();
+         action deactivateUserMain();
     };
  
     entity PartnerAssignments as projection on db.PartnerAssignments;
@@ -111,6 +110,4 @@ service UserManagementService
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
     action syncusers(); 
-    action deactivateUser();
-
 }

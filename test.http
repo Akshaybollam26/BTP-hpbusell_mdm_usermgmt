@@ -1,8 +1,9 @@
 ### 
 
-POST http://localhost:4004/user-management/syncusers
+POST http://localhost:3476/user-management/syncusers
 
 
 ###
 
-GET  http://localhost:4004/user-management/Users
+POST  http://localhost:3476/user-management/Users(email='emma.jones@hp.com',IsActiveEntity='true')/deactivateUserMain
+

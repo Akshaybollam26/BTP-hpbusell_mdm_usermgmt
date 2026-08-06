@@ -1,11 +1,1 @@
-email,firstName,lastName
-john.smith@hp.com,John,Smith
-emma.jones@hp.com,Emma,Jones
-michael.brown@hp.com,Michael,Brown
-olivia.davis@hp.com,Olivia,Davis
-william.miller@hp.com,William,Miller
-sophia.wilson@hp.com,Sophia,Wilson
-james.moore@hp.com,James,Moore
-ava.taylor@hp.com,Ava,Taylor
-benjamin.anderson@hp.com,Benjamin,Anderson
-mia.thomas@hp.com,Mia,Thomas
+email,firstName,lastName,displayName,userName,active,userType,locale,preferredLanguage,timeZone,UserGroupIndicator

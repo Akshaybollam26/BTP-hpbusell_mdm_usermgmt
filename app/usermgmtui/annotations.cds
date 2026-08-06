@@ -1,10 +1,6 @@
 using UserManagementService as service from '../../srv/hpbuysellmdmusermgmt-service';
 
 annotate service.Users with @(
-     Capabilities: {
-        InsertRestrictions: {Insertable: true},
-        DeleteRestrictions: {Deletable: true}
-    },
     UI.HeaderInfo : {
         TypeName : 'User',
         TypeNamePlural : 'Users',
@@ -64,12 +60,52 @@ annotate service.Users with @(
             ID : 'CustomerAsstsFacet',
             Label : 'Customer Assignments',
             Target : 'customers/@UI.LineItem#Customers',
+            @UI.Hidden: {
+                $edmJson: {
+                    $Not: {
+                        $Or: [
+                            {
+                                $Eq: [
+                                    { $Path: 'userGroupIndicator' },
+                                    'C'
+                                ]
+                            },
+                            {
+                                $Eq: [
+                                    { $Path: 'userGroupIndicator' },
+                                    'SC'
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
         },
         {
             $Type : 'UI.ReferenceFacet',
             ID : 'SupplierAsstsFacet',
             Label : 'Supplier Assignments',
             Target : 'suppliers/@UI.LineItem#Suppliers',
+            @UI.Hidden: {
+                $edmJson: {
+                    $Not: {
+                        $Or: [
+                            {
+                                $Eq: [
+                                    { $Path: 'userGroupIndicator' },
+                                    'S'
+                                ]
+                            },
+                            {
+                                $Eq: [
+                                    { $Path: 'userGroupIndicator' },
+                                    'SC'
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }
         },
         {
             $Type : 'UI.ReferenceFacet',
@@ -104,11 +140,19 @@ annotate service.Users with @(
             Value : createdAt,
             Label : 'Created At',
         },
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'UserManagementService.deactivateUserMain',
+            Label : 'Deactivate',
+        },
     ],
     UI.SelectionFields : [
         email,
         firstName,
         lastName,
+        groups.groupName,
+        userGroupIndicator,
+        active,
     ],
     UI.CreateHidden : {
         $edmJson: {
@@ -253,20 +297,20 @@ annotate service.ChangeLogs with @(
     ]
 );
 
-annotate service.Users with {
-    email @(
-        Common.ValueList : {
-            $Type : 'Common.ValueListType',
-            CollectionPath : 'Users',
-            Parameters : [
-                {
-                    $Type : 'Common.ValueListParameterInOut',
-                    LocalDataProperty : email,
-                    ValueListProperty : 'email',
-                },
-            ],
-        },
-        Common.ValueListWithFixedValues : false,
-    )
-};
+// annotate service.Users with {
+//     email @(
+//         Common.ValueList : {
+//             $Type : 'Common.ValueListType',
+//             CollectionPath : 'Users',
+//             Parameters : [
+//                 {
+//                     $Type : 'Common.ValueListParameterInOut',
+//                     LocalDataProperty : email,
+//                     ValueListProperty : 'email',
+//                 },
+//             ],
+//         },
+//         Common.ValueListWithFixedValues : false,
+//     )
+// };
 
