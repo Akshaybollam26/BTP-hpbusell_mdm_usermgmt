@@ -16,10 +16,12 @@ entity Users : managed {
         @title: '{i18n>Email}';
 
         firstName          : String(100)
+        @Core.Immutable
         @title: '{i18n>FirstName}'
         @mandatory;
 
         lastName           : String(100)
+        @Core.Immutable
         @title: '{i18n>LastName}'
         @mandatory;
         displayName        : String(100);
@@ -30,7 +32,13 @@ entity Users : managed {
         locale             : String(20);
         preferredLanguage  : String(20);
         timeZone           : String(100);
-        userGroupIndicator : String(2);
+        // userGroupIndicator : String(2);
+        userGroupIndicator : String(50) enum {
+            Customer = 'C';
+            Supplier = 'S';
+            Customer_Supplier = 'SC';
+            Others = 'HP'
+        };
         customers          : Composition of many PartnerAssignments
                                  on  customers.user        = $self
                                  and customers.partnerType = 'C';
@@ -161,10 +169,8 @@ entity ProjectMaster {
 entity UserGroups : managed {
 
     key user      : Association to Users;
+    
     key groupId   : String;
-
-
-        groupName : String(255);
-
-
+    
+    groupName : String(255);
 }

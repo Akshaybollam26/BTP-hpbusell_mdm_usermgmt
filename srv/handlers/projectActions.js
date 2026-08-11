@@ -155,7 +155,6 @@ module.exports = (srv) => {
             }
         );
         const grpcount = buysellcount.data.totalResults;
-        // const grpcount = 1;
         console.log("grp count", grpcount);
         const buysellgrps = await executeHttpRequest(
             { destinationName: 'IAS_SCIM' },
@@ -384,6 +383,11 @@ module.exports = (srv) => {
     srv.on('deactivateUserMain', async (req) => {
         const useremail = req.params[0].email;
         console.log(useremail)
+        const userData = await SELECT.one.from(Users).where({email: useremail});
+        console.log(userData);
+        if(!userData.active){
+            req.reject(404, `${useremail} has already been deactived.`);
+        }
         await UPDATE(Users).set({
             active: false,
             userGroupIndicator: ''
@@ -392,5 +396,6 @@ module.exports = (srv) => {
         await DELETE.from(UserGroups).where({ user_email: useremail })
         await DELETE.from(PartnerAssignments)
             .where({ user_email: useremail });
-    })
+        req.notify(`${useremail} have been deactivated.`);
+    });
 };

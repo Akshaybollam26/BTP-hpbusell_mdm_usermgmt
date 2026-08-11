@@ -179,21 +179,21 @@ sap.ui.define([
             this.vhdForProjectsFilter.open();
         },
         onTokenUpdate :  function(oEvent){
-            debugger;
-            var oMultiInput = oEvent.getSource();
-            if (oEvent.getParameter("type") !== "added") { 
-                return;
-            } 
-            var aAddedTokens = oEvent.getParameter("addedTokens") || []; 
-            aAddedTokens.forEach(function (oToken) { 
-                var sText = oToken.getText(); 
-                if (!sText) { 
-                    return; 
-                } 
-                if (!oToken.getKey()) { 
-                    oToken.setKey(sText); 
-                } 
-            });
+            // var oMultiInput = oEvent.getSource();
+            // if (oEvent.getParameter("type") !== "added") { 
+            //     return;
+            // } 
+            // var aAddedTokens = oEvent.getParameter("addedTokens") || []; 
+            // aAddedTokens.forEach(function (oToken) { 
+            //     var sText = oToken.getText(); 
+            //     if (!sText) { 
+            //         return; 
+            //     } 
+            //     if (!oToken.getKey()) { 
+            //         oToken.setKey(sText); 
+            //     } 
+            // });
+            console.log("testing");
         },
         vhdForProjects_onOK: function(oEvent){
             const oTable = this.vhdForProjectsFilter.getContent()[0];

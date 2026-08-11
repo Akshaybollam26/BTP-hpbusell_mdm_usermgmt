@@ -7,7 +7,34 @@ annotate service.Users with @(
         Title : { Value : email },
         Description : { Value : '{firstName} {lastName}' },
     },
-
+    UI.Identification : [
+        {
+            $Type : 'UI.DataFieldForAction',
+            Action : 'UserManagementService.deactivateUserMain',
+            Label : 'Deactivate',
+            @UI.Hidden: {
+                $edmJson: {
+                    $Or: [
+                        {
+                            $Not: {
+                                $Path: '/auth/canUpdate'
+                            }
+                        },
+                        {
+                            $Not: {
+                                $Path: 'active'
+                            }
+                        },
+                        {
+                            $Not: {
+                                $Path: 'IsActiveEntity'
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ],
     UI.FieldGroup #GeneratedGroup : {
         $Type : 'UI.FieldGroupType',
         Data : [
@@ -45,6 +72,11 @@ annotate service.Users with @(
                 $Type : 'UI.DataField',
                 Value : modifiedAt,
                 Label : 'Modified At',
+            },
+            {
+                $Type : 'UI.DataField',
+                Value : active,
+                Label : 'Active',
             },
         ],
     },
@@ -109,6 +141,12 @@ annotate service.Users with @(
         },
         {
             $Type : 'UI.ReferenceFacet',
+            ID : 'UserGroupFacet',
+            Label : 'User Groups',
+            Target : 'groups/@UI.LineItem#UserGroups',
+        },
+        {
+            $Type : 'UI.ReferenceFacet',
             ID : 'ChangeLogsFacet',
             Label : 'Change Logs',
             Target : 'changeLogs/@UI.LineItem#ChangeLogs',
@@ -141,6 +179,16 @@ annotate service.Users with @(
             Label : 'Created At',
         },
         {
+            $Type : 'UI.DataField',
+            Value : active,
+            Label : 'Status',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : userGroupIndicator,
+            Label : 'User Group',
+        },
+        {
             $Type : 'UI.DataFieldForAction',
             Action : 'UserManagementService.deactivateUserMain',
             Label : 'Deactivate',
@@ -151,7 +199,6 @@ annotate service.Users with @(
         firstName,
         lastName,
         groups.groupName,
-        userGroupIndicator,
         active,
     ],
     UI.CreateHidden : {
@@ -160,25 +207,65 @@ annotate service.Users with @(
         }
     },
 
+    // UI.UpdateHidden : {
+    //     $edmJson: {
+    //         $Not: { $Path: '/auth/canUpdate' }
+    //     }
+    // },
     UI.UpdateHidden : {
         $edmJson: {
-            $Not: { $Path: '/auth/canUpdate' }
+            $Or: [
+                {
+                    $Not: {
+                        $Path: '/auth/canUpdate'
+                    }
+                },
+                {
+                    $Not: {
+                        $Path: 'active'
+                    }
+                }
+            ]
         }
     },
- 
     UI.DeleteHidden : {
         $edmJson: {
             $Not: { $Path: '/auth/canDelete' }
         }
     }
 );
+// annotate service.Users with @(Common.SideEffects : {
+//     SourceActions: [
+//         'UserManagementService.deactivateUserMain'
+//     ],
+//     TargetProperties: [
+//         'active',
+//         'userGroupIndicator'
+//     ]
+// });
+
+annotate service.UserGroups with @(
+    Capabilities: {
+        InsertRestrictions: {Insertable: false},
+        DeleteRestrictions: {Deletable: false},
+        UpdateRestrictions: {Updatable: false}
+    },
+    UI.LineItem #UserGroups: [
+        {
+            $Type : 'UI.DataField',
+            Value : groupId,
+            Label : 'Group Id',
+        },
+        {
+            $Type : 'UI.DataField',
+            Value : groupName,
+            Label : 'Group Name',
+        }
+    ]
+);
 
 
 annotate service.PartnerAssignments with @(
-    Capabilities: {
-        InsertRestrictions: {Insertable: true},
-        DeleteRestrictions: {Deletable: true}
-    },
     UI.LineItem #Customers: [
         {
             $Type : 'UI.DataField',

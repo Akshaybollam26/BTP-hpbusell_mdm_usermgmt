@@ -41,10 +41,19 @@ service UserManagementService
         UpdateRestrictions: {Updatable: true}
     })
     entity Users              as projection on db.Users
-    actions{
-         action deactivateUserMain();
+    actions {
+        @(
+            cds.odata.bindingparameter.name: '_it',
+            Common.SideEffects: {
+                TargetProperties: [
+                    '_it/active',
+                    '_it/userGroupIndicator'
+                ]
+            }
+        )
+        action deactivateUserMain();
     };
- 
+
     entity PartnerAssignments as projection on db.PartnerAssignments;
  
     entity ProjectAssignments as projection on db.ProjectAssignments;
@@ -104,7 +113,6 @@ service UserManagementService
     function searchUsers(searchTerm: String)                                                       returns array of Users;
     function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;
     function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierMaster;
-    // function findSelectedProjects(userEmail: String, partnerId: String)
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectMaster;
 
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;

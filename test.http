@@ -1,6 +1,6 @@
 ### 
 
-POST http://localhost:3476/user-management/syncusers
+POST http://localhost:4004/user-management/syncusers
 
 
 ###

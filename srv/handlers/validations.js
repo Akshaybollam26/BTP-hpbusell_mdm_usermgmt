@@ -86,8 +86,8 @@ module.exports = (srv) => {
         const userGroupRecords = await SELECT.from(UserGroups).where({user_email : sUserEmail});
         console.log(userGroupRecords);
         for (const each of userGroupRecords) {
-            console.log(each.groupName);
-            if (each.groupName === "HP_BUYSELL_CUSTOMER_FINANCE_VIEWER_GRP") {
+            console.log(each.groupId, each.groupName);
+            if (each.groupId === "HP_BUYSELL_CUSTOMER_FINANCE_VIEWER_GRP") {
                 console.log("reached here");
                 return; // exits the entire handler
             }
