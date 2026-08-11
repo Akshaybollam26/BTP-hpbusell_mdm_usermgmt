@@ -1,83 +1,214 @@
-sap.ui.define(['sap/ui/core/mvc/ControllerExtension', 'sap/ui/model/Filter',
-	'sap/ui/model/FilterOperator'], function (ControllerExtension, Filter, FilterOperator) {
-	'use strict';
+sap.ui.define([
+    "sap/ui/core/mvc/ControllerExtension",
+    "sap/ui/model/Filter",
+    "sap/ui/model/FilterOperator",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
+    "sap/ui/core/util/File"
+], function (
+    ControllerExtension,
+    Filter,
+    FilterOperator,
+    MessageToast,
+    MessageBox,
+    File
+) {
+    "use strict";
 
-	return ControllerExtension.extend('hpbuysell.mdm.usermgmtui.ext.controller.ExtForListReportPage', {
-		// this section allows to extend lifecycle hooks or hooks provided by Fiori elements
-		onBeforeRebindTable: function (oEvent) {
-			const oCollectionBindingInfoAPI = oEvent.getParameter("collectionBindingInfo");
-			const oFilterBar = this.base.getView().byId("fe::FilterBar::Users");
-			const oFilterItems = oFilterBar.getFilterItems();
-			var aProjectIds = [], haveTokens = true, haveTypedValue = true;
-			var oMultiInput = this.base.getView().byId("hpbuysell.mdm.usermgmtui::UsersList--fe::FilterBar::Users::CustomFilterField::filterbarFieldForProjects").getCurrentContent()[0].getContent()
-			if (!oMultiInput) {
-				return;
-			}
-			var aTokens = oMultiInput.getTokens();
-			var sTypedValue = oMultiInput?.getValue()?.trim();
-			//check - execute filter if there are any tokens passed
-			if (!aTokens.length)
-				haveTokens = false;
-			else{
-				aProjectIds = aTokens.map(function (oToken) {
-					return oToken.getKey();
-				});
-			}
-			//check - execute further if atleast field is populated with typed value
-			if(!sTypedValue)
-				haveTypedValue = false;
-			else
-				aProjectIds.push(sTypedValue);
-			//if nothing is selected or entered - return
-			if(!haveTokens && !haveTypedValue)
-				return;
+    return ControllerExtension.extend(
+        "hpbuysell.mdm.usermgmtui.ext.controller.ExtForListReportPage",
+        {
+            // Fiori Elements hook
+            onBeforeRebindTable: function (oEvent) {
+                var oCollectionBindingInfoAPI = oEvent.getParameter("collectionBindingInfo");
 
-			// Remove FE's automatically generated filter for the custom field.
-			oCollectionBindingInfoAPI.filters = (oCollectionBindingInfoAPI.filters || []).filter(function (oFilter) {
-				return oFilter.sPath !== "customers/user_email";
-			});
-			var aInnerOrFilters = aProjectIds.map(function (sId) {
-				return new Filter("pj/projectId", FilterOperator.EQ, sId); // confirm exact property name on ProjectAssignments
-			});
-			var oInnerAny = new Filter({ filters: aInnerOrFilters, and: false });
+                const oFilterBar = this.base.getView().byId("fe::FilterBar::Users");
+                const oFilterItems = oFilterBar.getFilterItems();
 
-			var oCustomersAny = new Filter({
-				path: "customers",
-				operator: FilterOperator.Any,
-				variable: "pa",
-				condition: new Filter({
-					path: "pa/projects",
-					operator: FilterOperator.Any,
-					variable: "pj",
-					condition: oInnerAny
-				})
-			});
+                // temp logic
+                var oCustomFilterField = oFilterItems[6];
 
-			var oSuppliersAny = new Filter({
-				path: "suppliers",
-				operator: FilterOperator.Any,
-				variable: "pa",
-				condition: new Filter({
-					path: "pa/projects",
-					operator: FilterOperator.Any,
-					variable: "pj",
-					condition: oInnerAny
-				})
-			});
+                var oMultiInput = this.base.getView()
+                    .byId("hpbuysell.mdm.usermgmtui::UsersList--fe::FilterBar::Users::CustomFilterField::filterbarFieldForProjects")
+                    .getCurrentContent()[0]
+                    .getContent();
 
-			var oOuterOr = new Filter({ filters: [oCustomersAny, oSuppliersAny], and: false });
-			oCollectionBindingInfoAPI.addFilter(oOuterOr);
-		},
-		override: {
-			/**
-			 * Called when a controller is instantiated and its View controls (if available) are already created.
-			 * Can be used to modify the View before it is displayed, to bind event handlers and do other one-time initialization.
-			 * @memberOf hpbuysell.mdm.usermgmtui.ext.controller.ExtForListReportPage
-			 */
-			onInit: function () {
-				// you can access the Fiori elements extensionAPI via this.base.getExtensionAPI
-				var oModel = this.base.getExtensionAPI().getModel();
-			}
-		}
-	});
+                if (!oMultiInput) {
+                    return;
+                }
+
+                var aTokens = oMultiInput.getTokens();
+
+                if (!aTokens.length) {
+                    return;
+                }
+
+                var aProjectIds = aTokens.map(function (oToken) {
+                    return oToken.getKey();
+                });
+
+                var aInnerOrFilters = aProjectIds.map(function (sId) {
+                    return new Filter("pj/projectId", FilterOperator.EQ, sId);
+                });
+
+                var oInnerAny = new Filter({
+                    filters: aInnerOrFilters,
+                    and: false
+                });
+
+                var oCustomersAny = new Filter({
+                    path: "customers",
+                    operator: FilterOperator.Any,
+                    variable: "pa",
+                    condition: new Filter({
+                        path: "pa/projects",
+                        operator: FilterOperator.Any,
+                        variable: "pj",
+                        condition: oInnerAny
+                    })
+                });
+
+                var oSuppliersAny = new Filter({
+                    path: "suppliers",
+                    operator: FilterOperator.Any,
+                    variable: "pa",
+                    condition: new Filter({
+                        path: "pa/projects",
+                        operator: FilterOperator.Any,
+                        variable: "pj",
+                        condition: oInnerAny
+                    })
+                });
+
+                var oOuterOr = new Filter({
+                    filters: [oCustomersAny, oSuppliersAny],
+                    and: false
+                });
+
+                oCollectionBindingInfoAPI.addFilter(oOuterOr);
+            },
+
+            /**
+             * Custom export handler
+             */
+            _handleCustomExcelExport: function (oEvent) {
+                // Prevent standard export
+                oEvent.preventDefault();
+
+                debugger;
+
+                var oView = this.base.getView();
+                var oModel = this.base.getExtensionAPI().getModel();
+
+                if (!oModel) {
+                    MessageBox.error("Application runtime data model could not be found.");
+                    return;
+                }
+
+                var oTable = oEvent.getSource();
+                var aEmails = [];
+                var aSelectedContexts = oTable.getSelectedContexts();
+
+                if (aSelectedContexts && aSelectedContexts.length > 0) {
+                    aEmails = aSelectedContexts.map(function (oContext) {
+                        return oContext.getProperty("email");
+                    });
+                }
+
+                var oActionContext = oModel.bindContext("/exportUsers(...)");
+                oActionContext.setParameter("emails", aEmails);
+
+                oView.setBusy(true);
+
+                oActionContext.execute().then(function () {
+
+                    oView.setBusy(false);
+
+                    var oResult = oActionContext.getBoundContext().getObject();
+
+                    if (oResult && oResult.base64) {
+
+                        var sBinaryString = window.atob(oResult.base64);
+                        var iLen = sBinaryString.length;
+                        var oBytes = new Uint8Array(iLen);
+
+                        for (var i = 0; i < iLen; i++) {
+                            oBytes[i] = sBinaryString.charCodeAt(i);
+                        }
+
+                        var sFileName = oResult.fileName || "UserExport.xlsx";
+
+                        File.save(
+                            oBytes.buffer,
+                            sFileName.replace(".xlsx", ""),
+                            "xlsx",
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                        );
+
+                        MessageToast.show("Custom Excel report downloaded successfully.");
+
+                    } else {
+                        MessageBox.error("Backend did not return valid Excel file base64 content.");
+                    }
+
+                }.bind(this)).catch(function (oError) {
+
+                    oView.setBusy(false);
+
+                    var sMsg = oError.message ||
+                        "An error occurred while compiling your Excel export.";
+
+                    MessageBox.error("Export Processing Failed: " + sMsg);
+                });
+            },
+
+            override: {
+                onInit: function () {
+
+                    // Existing initialization
+                    var oModel = this.base.getExtensionAPI().getModel();
+
+                    var oView = this.base.getView();
+
+                    // Force FE initialization
+                    if (this.base && this.base.getExtensionAPI()) {
+                        this.base.getExtensionAPI().getIntentBasedNavigation();
+                    }
+
+                    // Locate MDC table
+                    var oTable = oView.findAggregatedObjects(true, function (oObj) {
+                        return oObj.isA && oObj.isA("sap.ui.mdc.Table");
+                    })[0];
+
+                    if (oTable) {
+
+                        oTable.attachBeforeExport(
+                            this._handleCustomExcelExport.bind(this)
+                        );
+
+                        console.log("Successfully attached backend export handler.");
+
+                    } else {
+
+                        setTimeout(function () {
+
+                            var oDelayedTable = oView.findAggregatedObjects(true, function (oObj) {
+                                return oObj.isA && oObj.isA("sap.ui.mdc.Table");
+                            })[0];
+
+                            if (oDelayedTable) {
+
+                                oDelayedTable.attachBeforeExport(
+                                    this._handleCustomExcelExport.bind(this)
+                                );
+
+                                console.log("Successfully attached delayed export handler.");
+                            }
+
+                        }.bind(this), 500);
+                    }
+                }
+            }
+        }
+    );
 });

@@ -1,6 +1,7 @@
 using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
- 
- 
+using {sap.changelog as cl} from '@cap-js/change-tracking';
+
+@changelog.Ui.ChangeHistoryView 
 service UserManagementService 
 @(path: '/user-management')
 @(require: 'authenticated-user')
@@ -59,9 +60,10 @@ service UserManagementService
     entity ProjectAssignments as projection on db.ProjectAssignments;
  
     @readonly
-    entity ChangeLogs         as projection on db.ChangeLogs;
-    // Read-only master/reference data - Value Help sources (Section 4.6-4.9)
- 
+    @restrict: [{ grant: 'READ', to: ['UsermgmtViewer', 'UsermgmtManage'] }]
+    entity ChangeView as projection on cl.ChangeView;
+
+
     @readonly
     entity CustomerMaster     as projection on db.CustomerMaster
                                  where
@@ -114,7 +116,11 @@ service UserManagementService
     function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;
     function getUnassignedSuppliers(userEmail: String, isActiveEntity: Boolean)                    returns array of SupplierMaster;
     function findSelectedProjects(partnerID: UUID, isActiveEntity: Boolean)                        returns array of ProjectMaster;
-
+        
+    action   exportUsers(emails: array of String)                                                  returns {
+        fileName : String;
+        base64   : LargeString;
+    };
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
     action syncusers(); 

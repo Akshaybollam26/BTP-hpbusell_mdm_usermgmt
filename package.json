@@ -2,11 +2,13 @@
   "name": "BTP-hpbuysell_mdm_UserMgmt",
   "version": "1.0.0",
   "dependencies": {
+    "@cap-js/change-tracking": "^2.1.0",
     "@sap-cloud-sdk/http-client": "^4.8.0",
     "@sap/cds": "^9",
     "@sap/xssec": "^4",
     "axios": "^1.19.0",
-    "better-sqlite3": "^13.0.1"
+    "better-sqlite3": "^13.0.1",
+    "exceljs": "^4.4.0"
   },
   "devDependencies": {
     "@cap-js/sqlite": "^2.4",
@@ -31,13 +33,13 @@
   ],
   "cds": {
     "requires": {
-       "db": {
+      "db": {
         "kind": "sqlite",
         "credentials": {
           "url": "db.sqlite"
         }
       },
-       "IAS_SCIM": {
+      "IAS_SCIM": {
         "kind": "rest",
         "credentials": {
           "destination": "IAS_SCIM"

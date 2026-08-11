@@ -145,12 +145,6 @@ annotate service.Users with @(
             Label : 'User Groups',
             Target : 'groups/@UI.LineItem#UserGroups',
         },
-        {
-            $Type : 'UI.ReferenceFacet',
-            ID : 'ChangeLogsFacet',
-            Label : 'Change Logs',
-            Target : 'changeLogs/@UI.LineItem#ChangeLogs',
-        },
     ],
     UI.LineItem : [
         {
@@ -234,15 +228,6 @@ annotate service.Users with @(
         }
     }
 );
-// annotate service.Users with @(Common.SideEffects : {
-//     SourceActions: [
-//         'UserManagementService.deactivateUserMain'
-//     ],
-//     TargetProperties: [
-//         'active',
-//         'userGroupIndicator'
-//     ]
-// });
 
 annotate service.UserGroups with @(
     Capabilities: {
@@ -343,46 +328,6 @@ annotate service.BusinessPartnerVH with @(
 //     ]
 //   }
 // );
-
-annotate service.ChangeLogs with @(
-    UI.LineItem #ChangeLogs: [
-        {
-            $Type : 'UI.DataField',
-            Value : changedOn,
-            Label : 'Changed On',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : changedBy,
-            Label : 'User',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : objectType,
-            Label : 'Object Type',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : fieldName,
-            Label : 'Field Name',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : oldValue,
-            Label : 'Old Value',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : newValue,
-            Label : 'New Value',
-        },
-        {
-            $Type : 'UI.DataField',
-            Value : changeType,
-            Label : 'Change Type',
-        },
-    ]
-);
 
 // annotate service.Users with {
 //     email @(

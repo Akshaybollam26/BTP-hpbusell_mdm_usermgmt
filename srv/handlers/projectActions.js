@@ -94,7 +94,7 @@ module.exports = (srv) => {
             return [];
         }
 
-        await INSERT.into(ProjectTarget).entries(projectsToInsert);
+        await srv.run(INSERT.into(ProjectTarget).entries(projectsToInsert));
 
         return projectsToInsert;
     });

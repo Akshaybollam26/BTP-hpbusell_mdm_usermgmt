@@ -47,8 +47,6 @@ entity Users : managed {
                                  on  suppliers.user        = $self
                                  and suppliers.partnerType = 'S';
 
-        changeLogs         : Composition of many ChangeLogs
-                                 on changeLogs.user = $self;
         groups             : Composition of many UserGroups
                                  on groups.user = $self;
 }
@@ -99,37 +97,6 @@ entity ProjectAssignments : cuid {
     projectName : String(100)
     @title: '{i18n>ProjectName}';
 }
-
-
-entity ChangeLogs : cuid {
-
-    user       : Association to Users;
-
-    objectType : String(30)
-    @title: '{i18n>ObjectType}';
-
-    objectKey  : String(100)
-    @title: '{i18n>ObjectKey}';
-
-    fieldName  : String(100)
-    @title: '{i18n>FieldName}';
-
-    oldValue   : LargeString
-    @title: '{i18n>OldValue}';
-
-    newValue   : LargeString
-    @title: '{i18n>NewValue}';
-
-    changeType : String(10)
-    @title: '{i18n>ChangeType}';
-
-    changedBy  : String(255)
-    @title: '{i18n>ChangedBy}';
-
-    changedOn  : Timestamp
-    @title: '{i18n>ChangedOn}';
-}
-
 
 entity CustomerMaster {
 
