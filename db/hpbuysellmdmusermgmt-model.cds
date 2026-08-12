@@ -10,7 +10,17 @@ using {
  * Email is the business key. Only firstName/lastName may
  * be changed once a record has been created.
  */
-entity Users : managed {
+
+
+aspect FlexFields {
+    FlexField1 : String(255);
+    FlexField2 : String(255);
+    FlexField3 : String(255);
+    FlexField4 : String(255);
+    FlexField5 : String(255);
+}
+
+entity Users : managed, FlexFields {
 
     key email              : String(241)
         @title: '{i18n>Email}';
@@ -52,7 +62,7 @@ entity Users : managed {
 }
 
 
-entity PartnerAssignments : cuid {
+entity PartnerAssignments : cuid, FlexFields {
 
     user        : Association to Users;
 
@@ -86,7 +96,7 @@ entity PartnerAssignments : cuid {
 }
 
 
-entity ProjectAssignments : cuid {
+entity ProjectAssignments : cuid, FlexFields {
 
     partner     : Association to PartnerAssignments;
 
@@ -133,7 +143,7 @@ entity ProjectMaster {
         status      : String(1);
 }
 
-entity UserGroups : managed {
+entity UserGroups : managed, FlexFields {
 
     key user      : Association to Users;
     

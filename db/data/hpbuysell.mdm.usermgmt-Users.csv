@@ -1,4 +1,4 @@
-email,firstName,lastName,displayName,userName,active,userType,locale,preferredLanguage,timeZone,UserGroupIndicator
+email,firstName,lastName,displayName,userName,active,userType,locale,preferredLanguage,timeZone,UserGroupIndicator,FlexField1,FlexField2,FlexField3,FlexField4,FlexField5
 john.smith@hp.com,John,Smith,John Smith,john.smith,true,C,en_US,en,UTC,C
 emma.jones@hp.com,Emma,Jones,Emma Jones,emma.jones,true,S,en_US,en,UTC,S
 michael.brown@hp.com,Michael,Brown,Michael Brown,michael.brown,true,CS,en_US,en,UTC,CS
