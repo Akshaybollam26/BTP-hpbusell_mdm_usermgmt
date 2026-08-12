@@ -167,21 +167,84 @@ module.exports = (srv) => {
                 }
             }
         );
+
+        //fetching buysell groups: 
+        const groupsCountResponse = await executeHttpRequest(
+            { destinationName: 'IAS_SCIM' },
+            {
+                method: 'GET',
+                url: `/scim/Groups?count=1`,
+                headers: {
+                    Accept: 'application/scim+json'
+                }
+            }
+        );
+
+        const groupCount = groupsCountResponse.data.totalResults;
+
+        console.log("IAS group count:", groupCount);
+        const groupsResponse = await executeHttpRequest(
+            { destinationName: 'IAS_SCIM' },
+            {
+                method: 'GET',
+                url: `/scim/Groups?count=${groupCount}`,
+                headers: {
+                    Accept: 'application/scim+json'
+                }
+            }
+        );
+
+        //Create Group GUID -> Custom Group Name map
+        const groupIdMap = new Map();
+
+        for (const group of groupsResponse.data.Resources) {
+
+            const customGroup =
+                group["urn:sap:cloud:scim:schemas:extension:custom:2.0:Group"];
+
+            if (customGroup?.name) {
+
+                groupIdMap.set(
+                    group.id,
+                    customGroup.name
+                );
+            }
+        }
+
+        console.log("Group ID Map:", groupIdMap);
         // 2. construct a users payload for further operations
 
         const usersinfo = buysellgrps.data.Resources.map(user => {
 
-            const groups = (user.groups || []).map(group => ({
-                groupId: group.value,
-                groupName: group.display
-            }));
+            const groups = (user.groups || [])
+                .map(group => {
+                    const groupId = groupIdMap.get(group.value);
+
+                    if (!groupId) {
+                        console.warn(
+                            `No custom group name found for group GUID: ${group.value}`
+                        );
+                        return null;
+                    }
+
+                    return {
+                        groupId: groupId,
+                        groupName: group.display
+                    };
+                })
+                .filter(Boolean);
+
+            // const groups = (user.groups || []).map(group => ({
+            //     groupId: group.$ref,
+            //     groupName: group.display
+            // }));
 
             const hasCustomer = groups.some(g =>
-                g.groupName.toLowerCase().includes("customer")
+                g.groupId?.toLowerCase().includes("customer")
             );
 
             const hasSupplier = groups.some(g =>
-                g.groupName.toLowerCase().includes("supplier")
+                g.groupId?.toLowerCase().includes("supplier")
             );
 
             let partnerType = "HP";
@@ -212,6 +275,7 @@ module.exports = (srv) => {
                 groups
             };
         });
+        console.log(JSON.stringify(usersinfo, null, 2));
         // 3. go by one by one user , 
 
         const existingUsers = await SELECT.from(Users); //fetching all users
@@ -234,6 +298,7 @@ module.exports = (srv) => {
         for (const user of usersinfo) {
             //1. if that user is not available in our DB , create a new user along with their usergroups
             const existingUser = existingUsersMap.get(user.email);
+
             if (!existingUser) {
 
                 await INSERT.into(Users).entries(user);
