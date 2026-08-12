@@ -40,8 +40,10 @@ module.exports = (srv) => {
     srv.on('READ', BusinessPartnerVH, async (req, next) => {
         const whereArr = req.query.SELECT.where;
         console.log(JSON.stringify(req.query, null, 2));
+ 
         function extractEqValue(fieldName) {
             if (!Array.isArray(whereArr)) return undefined;
+ 
             for (let i = 0; i < whereArr.length; i++) {
                 if (
                     whereArr[i]?.ref?.[0] === fieldName &&
@@ -51,64 +53,68 @@ module.exports = (srv) => {
                     return whereArr[i + 2].val;
                 }
             }
+ 
             return undefined;
         }
-
+ 
         function stripCondition(fieldName) {
             if (!Array.isArray(whereArr)) return;
             for (let i = 0; i < whereArr.length; i++) {
                 if (whereArr[i]?.ref?.[0] === fieldName && whereArr[i + 1] === '=') {
-                    const clauseStart = (i > 0 && (whereArr[i - 1] === 'and' || whereArr[i - 1] === 'or')) ? i - 1 : i;
-                    const clauseEnd = (whereArr[i + 3] === 'and' || whereArr[i + 3] === 'or') ? i + 3 : i + 2;
+                    const clauseStart = i > 0 && (whereArr[i - 1] === 'and' || whereArr[i - 1] === 'or') ? i - 1 : i;
+                    const clauseEnd = whereArr[i + 3] === 'and' || whereArr[i + 3] === 'or' ? i + 3 : i + 2;
                     whereArr.splice(clauseStart, clauseEnd - clauseStart + 1);
                     return;
                 }
             }
         }
-
+ 
         const rowID = extractEqValue('userEmail');
         let partnerType = extractEqValue('partnerType');
-
+ 
         console.log('[DEBUG BusinessPartnerVH READ] rowID:', rowID, '| partnerType:', partnerType);
-
+ 
         if (!rowID) {
             return next();
         }
-
+ 
         stripCondition('userEmail');
-
-        // Resolve the actual owning user by looking up this row - check
-        // the draft twin first, since a brand-new row only exists there
-        // until Save.
+ 
         const [draftRow, activeRow] = await Promise.all([
             SELECT.one.from(PartnerAssignments.drafts).where({ ID: rowID }),
             SELECT.one.from(PartnerAssignments).where({ ID: rowID })
         ]);
         const ownerRow = draftRow || activeRow;
-
+ 
         if (!ownerRow?.user_email) {
             return next();
         }
-
+ 
         const userEmail = ownerRow.user_email;
         if (!partnerType) partnerType = ownerRow.partnerType;
-
+ 
         const candidates = await next();
         const candidateList = Array.isArray(candidates) ? candidates : [candidates].filter(Boolean);
-
-        const [activeAssigned, draftAssigned] = await Promise.all([
-            SELECT.from(PartnerAssignments)
-                .columns('partnerId')
-                .where(partnerType ? { user_email: userEmail, partnerType } : { user_email: userEmail }),
-            SELECT.from(PartnerAssignments.drafts)
-                .columns('partnerId')
-                .where(partnerType ? { user_email: userEmail, partnerType } : { user_email: userEmail })
-        ]);
-
-        const assignedIDs = new Set(
-            [...activeAssigned, ...draftAssigned].map(p => p.partnerId).filter(Boolean)
-        );
-
+ 
+        // Check if draft data exists for this user
+        const draftAssignments = await
+        SELECT.from(PartnerAssignments.drafts)
+            .columns('partnerId')
+            .where(partnerType? { user_email: userEmail, partnerType} : { user_email: userEmail });
+ 
+        let assignedIDs;
+        if (draftAssignments.length > 0) {
+            assignedIDs = new Set(draftAssignments.map(r => r.partnerId).filter(Boolean));
+        }
+        else {
+            const activeAssignments = await SELECT.from(PartnerAssignments)
+            .columns('partnerId').where(partnerType ? { user_email: userEmail, partnerType } : { user_email: userEmail});
+ 
+            assignedIDs = new Set(
+                activeAssignments.map(r => r.partnerId).filter(Boolean)
+            );
+        }
+ 
         return candidateList.filter(row => !assignedIDs.has(row.partnerId));
     });
 

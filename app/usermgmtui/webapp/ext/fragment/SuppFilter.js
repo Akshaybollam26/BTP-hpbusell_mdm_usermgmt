@@ -28,7 +28,7 @@ sap.ui.define([
                     afterClose: function () { oDialog.destroy(); }
                 });
                 oDialog.setTokens(Handler._oMultiInput.getTokens().map(function (oToken) {
-                    return new Token({ key: oToken.getKey(), text: oToken.getText() });
+                    return new Token({ key: oToken.getKey() });
                 }));
                 oDialog.setModel(oModel);
                 oDialog.getTableAsync().then(function (oTable) {

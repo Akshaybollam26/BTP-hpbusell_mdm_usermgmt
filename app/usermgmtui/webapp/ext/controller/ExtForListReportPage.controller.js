@@ -25,8 +25,7 @@ sap.ui.define([
                 const oFilterBar = this.base.getView().byId("fe::FilterBar::Users");
                 const oFilterItems = oFilterBar.getFilterItems();
 
-                // temp logic
-                var oCustomFilterField = oFilterItems[6];
+                var aProjectIds = [];
 
                 var oMultiInput = this.base.getView()
                     .byId("hpbuysell.mdm.usermgmtui::UsersList--fe::FilterBar::Users::CustomFilterField::filterbarFieldForProjects")
@@ -38,14 +37,16 @@ sap.ui.define([
                 }
 
                 var aTokens = oMultiInput.getTokens();
+                var sTypedValue = oMultiInput.getValue();
 
-                if (!aTokens.length) {
+                if (!aTokens.length && !sTypedValue) {
                     return;
                 }
 
-                var aProjectIds = aTokens.map(function (oToken) {
+                aProjectIds = aTokens.map(function (oToken) {
                     return oToken.getKey();
                 });
+                aProjectIds.push(sTypedValue);
 
                 var aInnerOrFilters = aProjectIds.map(function (sId) {
                     return new Filter("pj/projectId", FilterOperator.EQ, sId);
