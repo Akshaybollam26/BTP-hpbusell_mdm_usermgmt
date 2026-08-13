@@ -1,4 +1,4 @@
-using UserManagementService as service from '../../srv/hpbuysellmdmusermgmt-service';
+using UserManagementService as service from '../../srv/hpbuyselladmusermgmt-service';
 
 annotate service.Users with @(
     UI.HeaderInfo : {
@@ -267,20 +267,6 @@ annotate service.PartnerAssignments with @(
     ]
 );
 
-// annotate service.Users:customers with {
-//     partnerId @(
-//         Common.Label: 'Customer ID',
-//         Common.ValueListWithFixedValues: false,
-//         Common.ValueList: {
-//             Label: 'Select Customer',
-//             CollectionPath: 'CustomerMaster',
-//             Parameters: [
-//             { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'customerId' },
-//             { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'customerName' },
-//             ]
-//         }
-//     )
-// };
 annotate service.PartnerAssignments:partnerId with @(
     Common.ValueList: {
         CollectionPath: 'BusinessPartnerVH',
@@ -305,7 +291,8 @@ annotate service.PartnerAssignments:partnerId with @(
                 ValueListProperty: 'userEmail',
                 LocalDataProperty: ID,
             },
-        ]
+        ],
+        Label : 'Customer ID ID',
     },
     Common.ValueListWithFixedValues : false,
     Common.ValueListForValidation : true,
@@ -317,32 +304,8 @@ annotate service.BusinessPartnerVH with @(
         partnerName
     ]
 );
-// annotate service.Users:suppliers.partnerId with @(
-//   Common.Label: 'Supplier ID',
-//   Common.ValueList: {
-//     Label: 'Select Supplier',
-//     CollectionPath: 'SupplierMaster',
-//     Parameters: [
-//       { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerId,   ValueListProperty: 'supplierId' },
-//       { $Type: 'Common.ValueListParameterInOut', LocalDataProperty: partnerName, ValueListProperty: 'supplierName' },
-//     ]
-//   }
-// );
 
-// annotate service.Users with {
-//     email @(
-//         Common.ValueList : {
-//             $Type : 'Common.ValueListType',
-//             CollectionPath : 'Users',
-//             Parameters : [
-//                 {
-//                     $Type : 'Common.ValueListParameterInOut',
-//                     LocalDataProperty : email,
-//                     ValueListProperty : 'email',
-//                 },
-//             ],
-//         },
-//         Common.ValueListWithFixedValues : false,
-//     )
-// };
-
+annotate service.BusinessPartnerVH with {
+    partnerId @title: 'Partner ID';
+    partnerName @title: 'Partner Name';
+};

@@ -138,7 +138,7 @@
                     "CustomerID": {
                       "label": "{i18n>customerId}",
                       "property": "customers/partnerId",
-                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustFilter",
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustomFilterForC",
                       "required": false,
                       "position": {
                         "placement": "After",
@@ -148,7 +148,7 @@
                     "SupplierID": {
                       "label": "{i18n>supplierId}",
                       "property": "suppliers/partnerId",
-                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.SuppFilter",
+                      "template": "hpbuysell.mdm.usermgmtui.ext.fragment.CustomFilterForS",
                       "required": false,
                       "position": {
                         "placement": "Before",
@@ -181,15 +181,6 @@
               "contextPath": "/Users",
               "controlConfiguration": {
                 "customers/@com.sap.vocabularies.UI.v1.LineItem#Customers": {
-                  "actions": {
-                    "custAsstAction": {
-                      "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddCustButton",
-                      "enabled": true,
-                      "requiresSelection": false,
-                      "text": "+ Add",
-                      "visible": false
-                    }
-                  },
                   "columns": {
                     "CustMngProjColumn": {
                       "header": "Manage",
@@ -218,15 +209,6 @@
                   }
                 },
                 "suppliers/@com.sap.vocabularies.UI.v1.LineItem#Suppliers": {
-                  "actions": {
-                    "supplierAsstAction": {
-                      "press": "hpbuysell.mdm.usermgmtui.ext.controller.PartnerAssignment.onPressAddSuppButton",
-                      "visible": false,
-                      "enabled": true,
-                      "requiresSelection": false,
-                      "text": "+ Add"
-                    }
-                  },
                   "columns": {
                     "SuppMngProjColumn": {
                       "header": "Manage",

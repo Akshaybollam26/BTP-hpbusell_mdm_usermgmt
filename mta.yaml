@@ -1,15 +1,16 @@
 _schema-version: 3.3.0
-ID: BTP-hpbuysell_mdm_UserMgmt
+ID: BTP-hpbuysell-adm-usermgmt
 description: A simple CAP project.
 version: 1.0.0
 modules:
-  - name: BTP-hpbuysell_mdm_UserMgmt-srv
+  - name: BTP-hpbuysell-adm-usermgmt-srv
     type: nodejs
     path: gen/srv
     requires:
-      - name: uaa_BTP-hpbuysell_mdm_UserMgmt
-      - name: BTP-hpbuysell_mdm_UserMgmt-destination-service
-      - name: BTP-hpbuysell_mdm_UserMgmt-connectivity
+      - name: uaa_BTP-hpbuysell-adm-usermgmt
+      - name: BTP-hpbuysell-adm-usermgmt-destination-service
+      - name: BTP-hpbuysell-adm-usermgmt-connectivity
+      - name: ust-portfolio-db
     provides:
       - name: srv-api
         properties:
@@ -19,41 +20,47 @@ modules:
       instances: 1
     build-parameters:
       builder: npm-ci
-  - name: BTP-hpbuysell_mdm_UserMgmt-destination-content
+  - name: BTP-hpbuysell-adm-usermgmt-destination-content
     type: com.sap.application.content
     requires:
-      - name: BTP-hpbuysell_mdm_UserMgmt-destination-service
+      - name: BTP-hpbuysell-adm-usermgmt-destination-service
         parameters:
           content-target: true
-      - name: BTP-hpbuysell_mdm_UserMgmt_html_repo_host
+      - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
         parameters:
           service-key:
-            name: BTP-hpbuysell_mdm_UserMgmt_html_repo_host-key
-      - name: uaa_BTP-hpbuysell_mdm_UserMgmt
+            name: BTP-hpbuysell-adm-usermgmt_html_repo_host-key
+      - name: uaa_BTP-hpbuysell-adm-usermgmt
         parameters:
           service-key:
-            name: uaa_BTP-hpbuysell_mdm_UserMgmt-key
+            name: uaa_BTP-hpbuysell-adm-usermgmt-key
+      - name: srv-api
     parameters:
       content:
         instance:
           destinations:
+            - Authentication: OAuth2UserTokenExchange
+              Name: hpbuysell-mdm-UserMgmt-srv-dest
+              TokenServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
+              TokenServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+              URL: ~{srv-api/srv-url}
+              sap.cloud.service: approuter
             - Name: approuter_BTP_hpbuysell_mdm_UserMgmt_html_repo_host
-              ServiceInstanceName: BTP-hpbuysell_mdm_UserMgmt-html5-app-host-service
-              ServiceKeyName: BTP-hpbuysell_mdm_UserMgmt_html_repo_host-key
+              ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-html5-app-host-service
+              ServiceKeyName: BTP-hpbuysell-adm-usermgmt_html_repo_host-key
               sap.cloud.service: approuter
             - Authentication: OAuth2UserTokenExchange
               Name: approuter_uaa_BTP_hpbuysell_mdm_UserMgmt
-              ServiceInstanceName: BTP-hpbuysell_mdm_UserMgmt-xsuaa-service
-              ServiceKeyName: uaa_BTP-hpbuysell_mdm_UserMgmt-key
-              sap.cloud.service: approuter
-          existing_destinations_policy: ignore
+              ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
+              ServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+          existing_destinations_policy: update
     build-parameters:
       no-source: true
-  - name: BTP-hpbuysell_mdm_UserMgmt-app-content
+  - name: BTP-hpbuysell-adm-usermgmt-app-content
     type: com.sap.application.content
     path: .
     requires:
-      - name: BTP-hpbuysell_mdm_UserMgmt_html_repo_host
+      - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
         parameters:
           content-target: true
     build-parameters:
@@ -74,8 +81,21 @@ modules:
         - npm run build:cf
       supported-platforms:
         []
+
+  - name: BTP-hpbuysell-adm-usermgmt-postgres-deployer
+    type: nodejs
+    path: gen/pg
+    parameters:
+      buildpack: nodejs_buildpack
+      no-route: true
+      no-start: true
+      tasks:
+        - name: deploy-to-postgresql
+          command: npm start
+    requires:
+      - name: ust-portfolio-db
 resources:
-  - name: BTP-hpbuysell_mdm_UserMgmt-destination-service
+  - name: BTP-hpbuysell-adm-usermgmt-destination-service
     type: org.cloudfoundry.managed-service
     parameters:
       config:
@@ -98,44 +118,41 @@ resources:
             existing_destinations_policy: update
         version: 1.0.0
       service: destination
-      service-name: BTP-hpbuysell_mdm_UserMgmt-destination-service
+      service-name: BTP-hpbuysell-adm-usermgmt-destination-service
       service-plan: lite
     requires:
       - name: srv-api
-  - name: BTP-hpbuysell_mdm_UserMgmt_html_repo_host
+  - name: BTP-hpbuysell-adm-usermgmt_html_repo_host
     type: org.cloudfoundry.managed-service
     parameters:
       service: html5-apps-repo
-      service-name: BTP-hpbuysell_mdm_UserMgmt-html5-app-host-service
+      service-name: BTP-hpbuysell-adm-usermgmt-html5-app-host-service
       service-plan: app-host
-  - name: uaa_BTP-hpbuysell_mdm_UserMgmt
+  - name: uaa_BTP-hpbuysell-adm-usermgmt
     type: org.cloudfoundry.managed-service
     parameters:
       path: ./xs-security.json
       service: xsuaa
-      service-name: BTP-hpbuysell_mdm_UserMgmt-xsuaa-service
+      service-name: BTP-hpbuysell-adm-usermgmt-xsuaa-service
       service-plan: application
       config:
-        xsappname: BTP-hpbuysell_mdm_UserMgmt-${org}-${space}
+        xsappname: BTP-hpbuysell-adm-usermgmt-${org}-${space}
         tenant-mode: dedicated
         oauth2-configuration:
           credential-types:
             - "binding-secret"
             - "x509"
-        role-collections:
-          - name: 'UsermgmtViewer (BTP-hpbuysell_mdm_UserMgmt ${org}-${space})'
-            description: 'generated'
-            role-template-references:
-              - '$XSAPPNAME.UsermgmtViewer'
-          - name: 'UsermgmtManage (BTP-hpbuysell_mdm_UserMgmt ${org}-${space})'
-            description: 'generated'
-            role-template-references:
-              - '$XSAPPNAME.UsermgmtManage'
-  - name: BTP-hpbuysell_mdm_UserMgmt-connectivity
+  - name: BTP-hpbuysell-adm-usermgmt-connectivity
     type: org.cloudfoundry.managed-service
     parameters:
       service: connectivity
       service-plan: lite
+  - name: ust-portfolio-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: postgresql-db
+      service-plan: free
+
 parameters:
   deploy_mode: html5-repo
   enable-parallel-deployments: true

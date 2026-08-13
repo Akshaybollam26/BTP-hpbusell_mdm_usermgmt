@@ -1,9 +1,9 @@
 using {
-    hpbuysell.mdm.usermgmt.Users,
-    hpbuysell.mdm.usermgmt.UserGroups,
-    hpbuysell.mdm.usermgmt.PartnerAssignments,
-    hpbuysell.mdm.usermgmt.ProjectAssignments
-} from './hpbuysellmdmusermgmt-model';
+    hpbuysell.adm.usermgmt.Users,
+    hpbuysell.adm.usermgmt.UserGroups,
+    hpbuysell.adm.usermgmt.PartnerAssignments,
+    hpbuysell.adm.usermgmt.ProjectAssignments
+} from './hpbuyselladmusermgmt-model';
 
 /**
  * Users

@@ -3,13 +3,13 @@
         id="CustomerFilterMultiInput"
         width="100%"
         showValueHelp="true"
-        core:require="{handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustFilter'}"
+        core:require="{handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/CustomFilterForC'}"
         valueHelpRequest="handler.onValueHelpRequest"
         tokenUpdate="handler.onTokenUpdate"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',
-            formatOptions: { operator: 'hpbuysell.mdm.usermgmtui.ext.fragment.CustFilter.filterItems' }
+            formatOptions: { operator: 'hpbuysell.mdm.usermgmtui.ext.fragment.CustomFilterForC.filterItems' }
         }">
     </MultiInput>
 </core:FragmentDefinition>

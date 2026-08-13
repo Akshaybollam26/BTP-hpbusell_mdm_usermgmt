@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@cap-js/change-tracking": "^2.1.0",
+    "@cap-js/postgres": "^2",
     "@sap-cloud-sdk/http-client": "^4.8.0",
     "@sap/cds": "^9",
     "@sap/xssec": "^4",
@@ -34,9 +35,9 @@
   "cds": {
     "requires": {
       "db": {
-        "kind": "sqlite",
+        "kind": "postgres",
         "credentials": {
-          "url": "db.sqlite"
+          "schema": "hpbuysell_adm_usermgmt"
         }
       },
       "IAS_SCIM": {

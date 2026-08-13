@@ -3,6 +3,8 @@ target/
 _out/
 gen/
 test/
+resources/
+app/usermgmtui/dist
 
 .cdsrc-private.json
 default-*.json

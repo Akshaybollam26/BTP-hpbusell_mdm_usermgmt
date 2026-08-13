@@ -1,4 +1,6 @@
 {
+  "xsappname": "hpbuysell-adm-usermgmt",
+  "tenant-mode": "dedicated",
   "scopes": [
     {
       "name": "$XSAPPNAME.UsermgmtViewer",

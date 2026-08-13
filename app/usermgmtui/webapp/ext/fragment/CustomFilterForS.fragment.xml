@@ -3,14 +3,14 @@
         id="SupplierFilterMultiInput"
         width="100%"
         showValueHelp="true"
-        core:require="{handler:'hpbuysell/mdm/usermgmtui/ext/fragment/SuppFilter'}"
+        core:require="{handler:'hpbuysell/mdm/usermgmtui/ext/fragment/CustomFilterForS'}"
         valueHelpRequest="handler.onValueHelpRequest"
         tokenUpdate="handler.onTokenUpdate"
         value="{
             path: 'filterValues>',
             type: 'sap.fe.macros.filter.type.Value',
             formatOptions: {
-                operator: 'hpbuysell.mdm.usermgmtui.ext.fragment.SuppFilter.filterItems'
+                operator: 'hpbuysell.mdm.usermgmtui.ext.fragment.CustomFilterForS.filterItems'
             }
         }"/>
 </core:FragmentDefinition>

@@ -1,32 +1,22 @@
-<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
-    <Dialog
-        id="vhdForProjectsFilter"
-        title="Select Projects" 
-        contentWidth="60%">
-        <content>
-            <Table
-                id="vhdForProjects_table"
-                items="{path: '/ProjectMaster', sorter: { path: 'projectId' }}"
-                mode="MultiSelect">
-                <columns>
-                    <Column><Text text="Project ID"/></Column>
-                    <Column><Text text="Project Name"/></Column>
-                </columns>
-                <items>
-                    <ColumnListItem type="Active">
-                        <cells>
-                            <Text text="{projectId}"/>
-                            <Text text="{projectName}"/>
-                        </cells>
-                    </ColumnListItem>
-                </items>
-            </Table>
-        </content>
-        <beginButton>
-            <Button text="OK" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn' }" press="handler.vhdForProjects_onOK"/>
-        </beginButton>
-        <endButton>
-            <Button text="Cancel" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn' }" press="handler.vhdForProjects_onCancel"/>
-        </endButton>
-    </Dialog>
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m"  xmlns:vh="sap.ui.comp.valuehelpdialog" xmlns:fb="sap.ui.comp.filterbar">
+    <vh:ValueHelpDialog id="vhdForProjectsFilter" title="Select Projects" supportMultiselect="true" key="projectId" descriptionKey="projectName" core:require="{ handler: 'hpbuysell/mdm/usermgmtui/ext/fragment/SuppMngProjColumn' }"
+        ok="handler.vhdForProjects_onOK" cancel="handler.vhdForProjects_onCancel" afterClose="handler.onVHDForProjects_AfterClose">
+        <vh:filterBar>
+            <fb:FilterBar id="VHDFilterBar" showGoOnFB="true" useToolbar="true" search="handler.onVHDForProjectFilter_Search">
+                <fb:filterGroupItems>
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="projectId" label="Project Id" visibleInFilterBar="true">
+                        <fb:control>
+                            <Input id="fb1"/>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                    <fb:FilterGroupItem groupName="__$INTERNAL$" name="projectName" label="Project Name" visibleInFilterBar="true">
+                        <fb:control>
+                            <Input id="fb2"/>
+                        </fb:control>
+                    </fb:FilterGroupItem>
+                </fb:filterGroupItems>
+            </fb:FilterBar>
+        </vh:filterBar>
+    </vh:ValueHelpDialog>
 </core:FragmentDefinition>
+ 

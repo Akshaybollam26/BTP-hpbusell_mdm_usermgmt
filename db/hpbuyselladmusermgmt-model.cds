@@ -1,4 +1,4 @@
-namespace hpbuysell.mdm.usermgmt;
+namespace hpbuysell.adm.usermgmt;
 
 using {
     cuid,
@@ -36,7 +36,8 @@ entity Users : managed, FlexFields {
         @mandatory;
         displayName        : String(100);
         userName           : String(100);
-        active             : Boolean default true;
+        active             : Boolean default true
+        @Core.Immutable;
 
         userType           : String(50);
         locale             : String(20);

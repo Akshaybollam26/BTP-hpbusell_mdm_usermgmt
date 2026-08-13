@@ -1,4 +1,4 @@
-using {hpbuysell.mdm.usermgmt as db} from '../db/hpbuysellmdmusermgmt-model';
+using {hpbuysell.adm.usermgmt as db} from '../db/hpbuyselladmusermgmt-model';
 using {sap.changelog as cl} from '@cap-js/change-tracking';
 
 @changelog.Ui.ChangeHistoryView 
@@ -80,6 +80,22 @@ service UserManagementService
                                      status = 'A';
  
     entity BusinessPartnerVH  as
+            
+            select from SupplierMaster {
+                key supplierId   as partnerId,
+                    cast(
+                        null as String(10)
+                    )            as customerId,
+                    supplierId   as supplierId,
+                    supplierName as partnerName,
+                    cast(
+                        'S' as String(1)
+                    )            as partnerType,
+                    cast(
+                        null as String(241)
+                    )            as userEmail
+            }
+            union all
             select from CustomerMaster {
                 key customerId   as partnerId,
                     customerId   as customerId,
@@ -94,23 +110,7 @@ service UserManagementService
                         null as String(241)
                     )            as userEmail
             }
-
-        union all
-
-            select from SupplierMaster {
-                key supplierId   as partnerId,
-                    cast(
-                        null as String(10)
-                    )            as customerId,
-                    supplierId   as supplierId,
-                    supplierName as partnerName,
-                    cast(
-                        'S' as String(1)
-                    )            as partnerType,
-                    cast(
-                        null as String(241)
-                    )            as userEmail
-            };
+;
     entity UserGroups as projection on db.UserGroups;
     function searchUsers(searchTerm: String)                                                       returns array of Users;
     function getUnassignedCustomers(userEmail: String, isActiveEntity: Boolean)                    returns array of CustomerMaster;

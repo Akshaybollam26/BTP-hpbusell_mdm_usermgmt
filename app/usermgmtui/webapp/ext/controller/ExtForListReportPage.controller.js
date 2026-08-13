@@ -37,11 +37,17 @@ sap.ui.define([
                 }
 
                 var aTokens = oMultiInput.getTokens();
-                var sTypedValue = oMultiInput.getValue();
-
+                var sTypedValue = oMultiInput.getValue().trim();
+ 
                 if (!aTokens.length && !sTypedValue) {
                     return;
                 }
+                if(aTokens.length){
+                    aProjectIds = aTokens.map(function (oToken) {
+                        return oToken.getKey();
+                    });
+                }
+                sTypedValue && aProjectIds.push(sTypedValue);
 
                 aProjectIds = aTokens.map(function (oToken) {
                     return oToken.getKey();
