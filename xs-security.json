@@ -29,5 +29,9 @@
       ],
       "attribute-references": []
     }
+  ],
+  "authorities": [
+    "$XSAPPNAME.UsermgmtManage",
+    "$ACCEPT_GRANTED_AUTHORITIES"
   ]
 }

@@ -44,11 +44,20 @@ modules:
               TokenServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
               TokenServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
               URL: ~{srv-api/srv-url}
-              sap.cloud.service: approuter
+              sap.cloud.service: hpbuysell-adm-usermgmt-service
+            - Name: hpbuysell-mdm-common-srv-dest1
+              Description: HP Buy-Sell MDM Common OData V4 Service
+              URL: https://org-build-build-ai-subaccount-code-migration-space-btp-14b7b11c.cfapps.us10-001.hana.ondemand.com
+              Authentication: OAuth2UserTokenExchange
+              TokenServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service
+              TokenServiceKeyName: uaa_BTP-hpbuysell-adm-usermgmt-key
+              HTML5.DynamicDestination: true
+              HTML5.ForwardAuthToken: false
+              sap.cloud.service: hpbuysell-adm-usermgmt-service
             - Name: approuter_BTP_hpbuysell_mdm_UserMgmt_html_repo_host
               ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-html5-app-host-service
               ServiceKeyName: BTP-hpbuysell-adm-usermgmt_html_repo_host-key
-              sap.cloud.service: approuter
+              sap.cloud.service: hpbuysell-adm-usermgmt-service
             - Authentication: OAuth2UserTokenExchange
               Name: approuter_uaa_BTP_hpbuysell_mdm_UserMgmt
               ServiceInstanceName: BTP-hpbuysell-adm-usermgmt-xsuaa-service

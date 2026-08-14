@@ -23,6 +23,13 @@
           "annotations": [],
           "odataVersion": "4.0"
         }
+      },
+      "mdmCommonService": {
+        "uri": "/common/",
+        "type": "OData",
+        "settings": {
+          "odataVersion": "4.0"
+        }
       }
     },
     "crossNavigation": {
@@ -83,6 +90,15 @@
           "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
+        }
+      },
+      "mdmCommon": {
+        "dataSource": "mdmCommonService",
+        "preload": true,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true
         }
       },
       "@i18n": {
@@ -263,6 +279,6 @@
   },
   "sap.cloud": {
     "public": true,
-    "service": "approuter"
+    "service": "hpbuysell-adm-usermgmt-service"
   }
 }

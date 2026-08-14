@@ -4,8 +4,8 @@ using {sap.changelog as cl} from '@cap-js/change-tracking';
 @changelog.Ui.ChangeHistoryView 
 service UserManagementService 
 @(path: '/user-management')
-@(require: 'authenticated-user')
- {
+// @(require: 'authenticated-user')
+{
     @odata.singleton  @cds.persistence.skip
  
     entity auth {
@@ -123,5 +123,6 @@ service UserManagementService
     };
     action   addProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String)    returns array of ProjectAssignments;
     action   removeProjects(partnerID: UUID, isActiveEntity: Boolean, projectIds: array of String) returns Boolean;
-    action syncusers(); 
+    action syncusers();
+    
 }
